@@ -154,14 +154,24 @@
     Anything that needs to break this rule should say why in a comment
     rather than quietly hand-rolling another `py-*`.
   */
+  /*
+    Section rhythm. Deliberately asymmetric - more above than below - so a
+    heading reads as belonging to the block under it rather than floating
+    between two equal gaps.
+
+    Opened up from 4rem/3.25rem. At the old values the sections butted into
+    each other and the page read as one continuous wall of content; the
+    argument is dense enough that the space between its parts is doing real
+    work, and this is the cheapest way to buy it.
+  */
   .section-y {
-    padding-top: 2.5rem;
-    padding-bottom: 2.25rem;
+    padding-top: 3.5rem;
+    padding-bottom: 3rem;
   }
   @media (min-width: 768px) {
     .section-y {
-      padding-top: 4rem;
-      padding-bottom: 3.25rem;
+      padding-top: 6rem;
+      padding-bottom: 5rem;
     }
   }
 
