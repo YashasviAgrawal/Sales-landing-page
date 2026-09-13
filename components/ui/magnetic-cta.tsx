@@ -47,7 +47,7 @@ export function MagneticCta({
     "inline-flex items-center justify-center whitespace-nowrap rounded-full px-7 py-3.5 text-[15px] font-medium transition-colors duration-300 active:scale-[0.985]";
   const skin =
     variant === "solid"
-      ? "bg-signal text-ink-950 hover:bg-signal-lift"
+      ? "glow-cta bg-signal text-ink-950 hover:bg-signal-lift"
       : "border border-white/20 text-paper hover:border-signal hover:text-signal";
 
   return (

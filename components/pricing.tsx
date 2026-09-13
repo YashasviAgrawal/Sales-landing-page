@@ -26,7 +26,7 @@ export function Pricing() {
           <Reveal className="lg:col-span-5" direction="right" distance={28}>
             <HoverCard
               lift={6}
-              className="flex h-full flex-col justify-between rounded-[12px] border border-signal/35 bg-ink-950 p-8 sm:p-10"
+              className="glow-panel flex h-full flex-col justify-between rounded-[12px] border border-signal/35 bg-ink-950 p-8 sm:p-10"
             >
               <div>
                 <p className="text-[13px] text-signal">Start here</p>

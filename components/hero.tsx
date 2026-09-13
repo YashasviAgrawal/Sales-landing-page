@@ -195,7 +195,7 @@ function LeakPipeline() {
       initial={reduce ? { opacity: 1 } : { opacity: 0, y: 28 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.9, delay: 0.25, ease: EASE }}
-      className="relative rounded-[12px] border hairline bg-ink-900/60 p-6 backdrop-blur-sm sm:p-8"
+      className="glow-panel relative rounded-[12px] border hairline bg-ink-900/60 p-6 backdrop-blur-sm sm:p-8"
     >
       {/* A hairline that traces the panel edge once on arrival. */}
       <motion.span

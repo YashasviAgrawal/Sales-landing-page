@@ -235,7 +235,7 @@ export function AnimatedFooter({
   */
   const cc = charColor ?? "#1e6d4a";
   const hc = hoverColor ?? "#3ddc97";
-  const hcc = hoverCharColor ?? "#060d0a";
+  const hcc = hoverCharColor ?? "#000000";
 
   // Live-tunable values read inside the animation loop, so tweaking a color or
   // the parallax strength never tears down and rebuilds the ASCII scene.
@@ -517,7 +517,7 @@ export function AnimatedFooter({
         className
       )}
       style={{
-        backgroundColor: background ?? "#060d0a",
+        backgroundColor: background ?? "#000000",
         color: textColor ?? "#eaf2ed",
         containerType: "inline-size",
       }}

@@ -26,14 +26,22 @@
 */
 
 @theme {
-  /* Base - green-black. The reference's cards and ground are not neutral
-     grey; they keep the green in them, which is what makes the mint read as
-     light coming off the surface rather than paint laid on it. Never #000. */
-  --color-ink-950: #060d0a;
-  --color-ink-900: #0b1611;
-  --color-ink-850: #101d17;
-  --color-ink-800: #16261e;
-  --color-ink-700: #21362b;
+  /* Base - black, with the green moved off the ground and into the light.
+
+     This ramp used to carry the green in the surfaces themselves (#0b1611 and
+     up), which tinted every section and left the mint CTA sitting on a field
+     of its own colour with nothing to push against. The ground is now true
+     black and the steps above it are all but neutral - a couple of points of
+     green at most, enough that the surfaces are not dead grey.
+
+     The green now lives where it reads as light: the ambient washes, the
+     glows below, and the accent itself. Mint on black is the contrast the
+     page was missing. */
+  --color-ink-950: #000000;
+  --color-ink-900: #0a0d0b;
+  --color-ink-850: #0f1311;
+  --color-ink-800: #151a17;
+  --color-ink-700: #202823;
 
   /* Text - near-white for figures, green-grey as it steps back. */
   --color-paper: #eaf2ed;
@@ -187,9 +195,16 @@
     case where cheap panels band, and the reference's ground is visibly
     grained rather than smooth. About 400 bytes.
   */
+  /*
+    Screen, not overlay, since the ground went black. Overlay multiplies
+    against the backdrop, so on #000 it resolves to #000 and the grain
+    vanished entirely - exactly where it is needed most, because the low end
+    of a large radial gradient is where banding shows. Screen adds a noise
+    floor of about five levels: invisible as grey, enough to dither the wash.
+  */
   .grain {
-    opacity: 0.32;
-    mix-blend-mode: overlay;
+    opacity: 0.1;
+    mix-blend-mode: screen;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
     animation: grain-shift 8s steps(6) infinite;
   }
@@ -220,36 +235,61 @@
     to be re-found when the palette moves. The components animate position
     only; the paint is all here.
   */
+  /*
+    Tightened when the ground went black. The same wash over #060d0a read as
+    atmosphere; over #000 it reads as fog, because there is nothing under it
+    any more. Smaller radii and lower mixes turn them back into what they are
+    meant to be - light spilling in from off-screen, not a green field.
+  */
   .wash-hero-near {
     background: radial-gradient(
-      900px 520px at 12% -8%,
-      color-mix(in srgb, var(--color-aura) 55%, transparent),
-      color-mix(in srgb, var(--color-signal) 7%, transparent) 34%,
-      transparent 64%
+      760px 440px at 10% -10%,
+      color-mix(in srgb, var(--color-aura) 40%, transparent),
+      color-mix(in srgb, var(--color-signal) 5%, transparent) 30%,
+      transparent 56%
     );
   }
   .wash-hero-far {
     background: radial-gradient(
-      680px 460px at 88% 18%,
-      color-mix(in srgb, var(--color-aura) 30%, transparent),
-      transparent 60%
+      580px 400px at 90% 16%,
+      color-mix(in srgb, var(--color-aura) 22%, transparent),
+      transparent 54%
     );
   }
   .wash-book {
     background: radial-gradient(
-      700px 420px at 78% 0%,
-      color-mix(in srgb, var(--color-aura) 40%, transparent),
-      color-mix(in srgb, var(--color-signal) 5%, transparent) 40%,
-      transparent 64%
+      600px 380px at 80% 0%,
+      color-mix(in srgb, var(--color-aura) 30%, transparent),
+      color-mix(in srgb, var(--color-signal) 4%, transparent) 36%,
+      transparent 58%
     );
   }
   .wash-close {
     background: radial-gradient(
-      760px 420px at 50% 120%,
-      color-mix(in srgb, var(--color-signal) 20%, transparent),
-      color-mix(in srgb, var(--color-aura) 42%, transparent) 38%,
-      transparent 68%
+      660px 380px at 50% 122%,
+      color-mix(in srgb, var(--color-signal) 14%, transparent),
+      color-mix(in srgb, var(--color-aura) 32%, transparent) 34%,
+      transparent 62%
     );
+  }
+
+  /*
+    THE GREEN SHADOW. On a green-black ground a glow like this was invisible;
+    on black it is the thing that keeps the page from looking like a hole.
+
+    Two weights. `glow-cta` sits under the one button that matters, so the
+    mint pill reads as lit rather than printed. `glow-panel` pools under a
+    surface so it lifts off the black instead of being cut out of it. Both are
+    spread-negative and heavily offset, which keeps the glow below the
+    element where a shadow belongs rather than haloing it evenly.
+  */
+  .glow-cta {
+    box-shadow: 0 14px 44px -16px
+      color-mix(in srgb, var(--color-signal) 55%, transparent);
+  }
+  .glow-panel {
+    box-shadow: 0 30px 90px -42px
+      color-mix(in srgb, var(--color-aura) 85%, transparent);
   }
 
   /*

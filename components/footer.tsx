@@ -47,7 +47,7 @@ export function Footer() {
       <div className="h-[240px] w-full border-b hairline sm:h-[280px] md:h-[340px]">
         <AnimatedFooter
           headingLines={["SALES", "BRAIN"]}
-          background="#0b1611"
+          background="#0a0d0b"
           columns={44}
           cellSize={13}
           fontSize={12}
