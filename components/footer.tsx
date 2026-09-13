@@ -15,6 +15,22 @@ export function Footer() {
   const [status, setStatus] = useState<Status>("idle");
   const reduce = useReducedMotion();
 
+  /*
+    ⚠ PLACEHOLDER - THIS SENDS NOTHING AND MUST BE WIRED BEFORE LAUNCH.
+
+    The label above this field promises the seven-point checklist and the
+    success state says to go and check your inbox. Right now the "request"
+    is a 700ms timer: the address is discarded and no email is ever sent.
+
+    Left as-is, the first thing a prospect experiences is the page breaking
+    a promise - on a site whose entire argument is that we tell you the
+    truth even when it costs us the deal. That is a worse failure here than
+    on an ordinary newsletter box.
+
+    Replace the timer with a real POST to your list provider, and keep the
+    thrown error: the catch already shows the failure state rather than
+    claiming success.
+  */
   async function submit() {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setStatus("error");
@@ -22,7 +38,6 @@ export function Footer() {
     }
     setStatus("loading");
     try {
-      // Wire this to your list provider.
       await new Promise((r) => setTimeout(r, 700));
       setStatus("done");
       setEmail("");
@@ -41,7 +56,7 @@ export function Footer() {
         way the drama is additive and nothing is lost.
 
         The two source images are funnels that narrow stage by stage - the
-        page's own argument, sampled into glyphs that light under the pointer.
+        page’s own argument, sampled into glyphs that light under the pointer.
       */}
       {/* Half the height it was. It is a signature, not a section. */}
       <div className="h-[240px] w-full border-b hairline sm:h-[280px] md:h-[340px]">
@@ -57,9 +72,14 @@ export function Footer() {
       <div className="mx-auto grid w-full max-w-[1240px] grid-cols-1 gap-10 px-5 py-12 md:grid-cols-12 md:px-8">
         <Reveal className="md:col-span-5">
           <p className="text-[1.5rem] font-medium tracking-tight">{brand.name}</p>
-          <p className="mt-4 max-w-[34ch] text-[15px] leading-relaxed text-body">
-            We find the stage where your sales leaks, fix that stage, and show
-            you what changed.
+          {/* The positioning line, verbatim, in the last place it can be read.
+              The hero opens on it and the footer closes on it; saying it two
+              different ways is what makes a position stop landing. */}
+          <p className="mt-4 max-w-[34ch] text-[17px] leading-relaxed text-paper">
+            {brand.tagline}
+          </p>
+          <p className="mt-3 max-w-[34ch] text-[15px] leading-relaxed text-body">
+            Every agency sells you a cure. We find the disease first.
           </p>
           <p className="mt-8 text-[14px] text-muted">{brand.city}</p>
           <a
@@ -91,7 +111,8 @@ export function Footer() {
             htmlFor="footer-email"
             className="block text-[13px] text-muted"
           >
-            One leaking sales system, taken apart, every week
+            The 7-point checklist we use in every audit. Run it on your own
+            business tonight.
           </label>
           <div className="mt-5 flex gap-2">
             <input
@@ -145,7 +166,7 @@ export function Footer() {
             )}
             {status === "done" && (
               <span className="text-body">
-                You are on the list. First issue lands Tuesday.
+                Sent. Check your inbox for the checklist.
               </span>
             )}
           </p>

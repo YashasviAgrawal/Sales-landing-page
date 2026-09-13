@@ -17,8 +17,8 @@ export function Faq() {
         <div className="lg:col-span-4">
           <div className="lg:sticky lg:top-28">
             <WordReveal
-              text="Questions founders actually ask"
-              highlight="actually ask"
+              text="Straight answers."
+              highlight="answers."
               className="display-tight text-3xl font-medium sm:text-5xl"
             />
           </div>

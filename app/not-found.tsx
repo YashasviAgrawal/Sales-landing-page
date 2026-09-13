@@ -6,7 +6,7 @@ import { MagneticCta } from "@/components/ui/magnetic-cta";
 
 /*
   A real 404, so a mistyped or stale URL lands somewhere branded with a way
-  back, rather than on the framework's bare default.
+  back, rather than on the framework’s bare default.
 */
 export default function NotFound() {
   return (
@@ -22,8 +22,8 @@ export default function NotFound() {
           as="h1"
           trigger="mount"
           delay={0.1}
-          text="This page has a location problem."
-          highlight="location"
+          text="This one really is broken."
+          highlight="really is broken."
           className="display-tight mx-auto mt-6 max-w-[18ch] text-4xl font-medium sm:text-6xl"
         />
 
@@ -38,7 +38,7 @@ export default function NotFound() {
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <MagneticCta href="/">Back to the start</MagneticCta>
             <MagneticCta href={brand.bookingUrl} variant="ghost">
-              Book the audit
+              Book the free audit
             </MagneticCta>
           </div>
         </Reveal>

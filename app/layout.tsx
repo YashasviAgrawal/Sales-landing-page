@@ -7,20 +7,20 @@ import { AnimatedCursor } from "@/components/ui/animated-cursor";
 
 export const metadata: Metadata = {
   metadataBase: new URL(`https://${brand.domain}`),
-  title: `${brand.name} - Find where your sales is leaking`,
+  title: `${brand.name} - Find the one thing costing you revenue`,
   description:
-    "Sales is not random. It leaks at one of five stages. We run a paid one-week diagnostic, name the stage, fix it, and show you what changed.",
+    "Your revenue isn’t broken everywhere. It’s broken in one place. A free 45-minute audit names the leak - offer, message, leads, funnel, conversion, pricing or ecosystem - and tells you the fix, whether you hire us or not.",
   openGraph: {
-    title: "Your sales problem has a location.",
+    title: "Your revenue isn’t broken everywhere. It’s broken in one place.",
     description:
-      "Some months close, some don't, and you can't say why. Sales leaks at one specific stage. We find it.",
+      "Every agency sells you a cure. We find the disease first. Free 45-minute sales audit, no pitch.",
     url: `https://${brand.domain}`,
     siteName: brand.name,
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Your sales problem has a location.",
+    title: "Your revenue isn’t broken everywhere. It’s broken in one place.",
   },
   robots: { index: true, follow: true },
 };

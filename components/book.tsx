@@ -32,7 +32,7 @@ export function Book() {
   const [form, setForm] = useState({
     name: "",
     email: "",
-    company: "",
+    website: "",
     context: "",
   });
 
@@ -51,9 +51,9 @@ export function Book() {
     const body = [
       `Name: ${form.name}`,
       `Email: ${form.email}`,
-      form.company ? `Company: ${form.company}` : null,
+      form.website ? `Website: ${form.website}` : null,
       "",
-      "Where sales feels like it is leaking:",
+      "Biggest thing holding revenue back right now:",
       form.context || "(not said yet)",
     ]
       .filter(Boolean)
@@ -61,7 +61,7 @@ export function Book() {
 
     const href =
       `mailto:${brand.email}` +
-      `?subject=${encodeURIComponent(`Leak audit request - ${form.name}`)}` +
+      `?subject=${encodeURIComponent(`Sales audit request - ${form.name}`)}` +
       `&body=${encodeURIComponent(body)}`;
 
     window.location.href = href;
@@ -101,20 +101,31 @@ export function Book() {
         <div className="lg:col-span-5">
           <WordReveal
             text={book.heading}
-            highlight="is leaving"
+            highlight="Then decide."
             stagger={0.07}
-            className="display-tight max-w-[13ch] text-4xl font-medium sm:text-5xl lg:text-[3.6rem]"
+            className="display-tight max-w-[12ch] text-4xl font-medium sm:text-5xl lg:text-[3.6rem]"
           />
           <Reveal delay={0.12} blur>
-            <p className="mt-6 max-w-[42ch] text-[16px] leading-relaxed text-body">
+            <p className="mt-6 max-w-[40ch] text-[17px] leading-relaxed text-paper">
               {book.lead}
+            </p>
+            <p className="mt-3 max-w-[40ch] text-[17px] leading-relaxed text-body">
+              {book.support}
             </p>
           </Reveal>
           <Reveal delay={0.18}>
-            <p className="mt-6 max-w-[38ch] text-[14px] leading-relaxed text-muted">
-              {book.support}
+            <p className="mt-7 text-[14px] text-muted">{book.scarcity}</p>
+
+            {/*
+              The P.S. The cost of waiting, stated once, at the last possible
+              moment. It is italic and quiet on purpose: an aggressive version
+              of this sentence would undo the whole no-pitch promise above it.
+            */}
+            <p className="mt-7 max-w-[42ch] border-l-2 border-signal/40 pl-4 text-[14px] italic leading-relaxed text-muted">
+              {book.ps}
             </p>
-            <p className="mt-6 text-[14px] text-muted">{brand.city}</p>
+
+            <p className="mt-7 text-[14px] text-muted">{brand.city}</p>
             <a
               href={`mailto:${brand.email}`}
               className="link-underline mt-1 inline-block text-[14px] text-body transition-colors hover:text-signal"
@@ -156,17 +167,22 @@ export function Book() {
 
               <label className="flex flex-col gap-2 sm:col-span-2">
                 <span className="text-[13px] text-muted">
-                  {book.fields.company}
+                  {book.fields.website}
                 </span>
                 <input
                   className={field}
-                  value={form.company}
-                  onChange={(e) => set("company", e.target.value)}
-                  autoComplete="organization"
-                  placeholder="Company name"
+                  value={form.website}
+                  onChange={(e) => set("website", e.target.value)}
+                  autoComplete="url"
+                  placeholder="yourcompany.com"
                 />
               </label>
 
+              {/*
+                The qualifier. It is the fourth and last field because it is
+                the one that earns its place twice: it filters out tyre-kickers
+                and it gives us the first half of the call before it starts.
+              */}
               <label className="flex flex-col gap-2 sm:col-span-2">
                 <span className="text-[13px] text-muted">
                   {book.fields.context}
@@ -175,7 +191,7 @@ export function Book() {
                   className={`${field} min-h-[96px] resize-y`}
                   value={form.context}
                   onChange={(e) => set("context", e.target.value)}
-                  placeholder="Good calls, then silence. Two of the last six proposals closed and I cannot say why."
+                  placeholder="Good calls, then silence. Two of the last six proposals closed and I can’t say why."
                 />
               </label>
             </div>

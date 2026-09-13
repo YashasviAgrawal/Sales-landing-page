@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
     - links are no longer preventDefault()ed. The original swallowed every
       click, which meant an anchor nav navigated nowhere - fatal here, where
       the header also renders on /terms and /privacy and the hrefs are
-      root-relative ("/#pricing") specifically so they can leave those pages.
+      root-relative ("/#mechanism") specifically so they can leave those pages.
     - optional scroll spy, so the light tracks the section you are actually
       reading instead of only the last thing clicked
 */

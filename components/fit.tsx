@@ -6,11 +6,10 @@ import { fit } from "@/lib/content";
 
 export function Fit() {
   return (
-    /* No border-t: the pricing block above is tinted, so its edge divides. */
-    <Section>
+    <Section className="border-t hairline">
       <WordReveal
         text={fit.heading}
-        highlight="not for everyone"
+        highlight="Not everyone."
         className="display-tight text-3xl font-medium sm:text-5xl lg:text-[3.4rem]"
       />
 

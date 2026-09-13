@@ -63,7 +63,7 @@ export function Header() {
             transition={{ type: "spring", stiffness: 320, damping: 22 }}
             className="hidden rounded-full bg-signal px-5 py-2.5 text-[14px] font-medium text-ink-950 transition-colors duration-300 hover:bg-signal-lift sm:inline-flex"
           >
-            {hero.primaryCta}
+            {hero.navCta}
           </motion.a>
           <button
             type="button"
@@ -117,6 +117,9 @@ export function Header() {
                 onClick={() => setOpen(false)}
                 className="mt-4 mb-2 inline-flex justify-center rounded-full bg-signal px-5 py-3 text-[15px] font-medium text-ink-950 sm:hidden"
               >
+                {/* The open mobile panel has room, so this one carries the
+                    full page-wide label rather than the shortened header
+                    version. */}
                 {hero.primaryCta}
               </a>
             </motion.div>

@@ -8,7 +8,7 @@ import {
   useTransform,
 } from "motion/react";
 import { ArrowDown } from "@phosphor-icons/react";
-import { brand, hero, stages } from "@/lib/content";
+import { brand, hero, links } from "@/lib/content";
 import { MagneticCta } from "@/components/ui/magnetic-cta";
 import { WordReveal } from "@/components/ui/word-reveal";
 import { CountUp } from "@/components/ui/count-up";
@@ -58,15 +58,18 @@ export function Hero() {
             {hero.eyebrow}
           </motion.p>
 
+          {/* Two sentences rather than one, so the type steps down a size and
+              the line length opens up. The turn is the whole idea, and it
+              needs to land as a turn, not as a wrapped fragment. */}
           <WordReveal
             as="h1"
             trigger="mount"
             delay={0.1}
-            stagger={0.07}
+            stagger={0.055}
             text={hero.headline}
-            highlight="location."
+            highlight="one place."
             highlightClassName="italic leading-[1.1] text-signal"
-            className="display-tight max-w-[13ch] text-[2.6rem] font-medium sm:text-6xl lg:text-[4.2rem]"
+            className="display-tight text-[2.3rem] font-medium sm:max-w-[17ch] sm:text-[3.2rem] lg:text-[3.6rem]"
           />
 
           <motion.p
@@ -89,6 +92,40 @@ export function Hero() {
               {hero.secondaryCta}
             </MagneticCta>
           </motion.div>
+
+          {/* The risk reversal sits directly under the button, where the
+              hesitation actually happens. Small, quiet, and the last thing
+              read before the click. */}
+          <motion.p
+            initial={reduce ? { opacity: 1 } : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.7, delay: 0.85 }}
+            className="mt-5 max-w-[42ch] text-[13px] leading-relaxed text-muted"
+          >
+            {hero.risk}
+          </motion.p>
+
+          {/* Three claims, no invented figures. A trust strip of numbers that
+              are not yet true would be the first thing a founder tests. */}
+          <motion.ul
+            initial={reduce ? { opacity: 1 } : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.7, delay: 0.95 }}
+            className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2.5 border-t hairline pt-6"
+          >
+            {hero.trust.map((t) => (
+              <li
+                key={t}
+                className="flex items-center gap-2 text-[12px] text-muted"
+              >
+                <span
+                  aria-hidden="true"
+                  className="h-1 w-1 rounded-full bg-signal/70"
+                />
+                {t}
+              </li>
+            ))}
+          </motion.ul>
         </motion.div>
 
         <motion.div style={{ y: panelY }} className="lg:col-span-6 lg:pl-6">
@@ -103,19 +140,19 @@ export function Hero() {
 
 /*
   The hero subhead, with the phrase that carries the whole argument made
-  hoverable. "One stage" is the claim the rest of the page spends itself
+  hoverable. "The exact leak" is the claim the rest of the page spends itself
   proving, and a reader meeting it in the first viewport has no idea yet
-  which five stages are meant - so the answer sits on the phrase rather than
+  which links are meant - so the answer sits on the phrase rather than
   forcing a scroll.
 
-  One tooltip, not five. The stage names in the section below live inside
+  One tooltip, not seven. The link names in the section below live inside
   buttons, and a tooltip trigger there would nest a control inside a control.
 
   The split is derived from the copy rather than hardcoded, so editing
   hero.sub in lib/content.ts cannot leave a stale fragment behind: if the
   phrase is ever removed, this renders the sentence plainly.
 */
-const TOOLTIP_PHRASE = "one stage";
+const TOOLTIP_PHRASE = "the exact leak";
 
 function SubWithTooltip() {
   const at = hero.sub.indexOf(TOOLTIP_PHRASE);
@@ -127,7 +164,7 @@ function SubWithTooltip() {
       <AnimatedTooltip
         variant="indis"
         restColor="var(--color-paper)"
-        content="Offer, Message, Demand, Conversion or Retention. Almost never all five at once."
+        content="Offer, Message, Leads, Funnel, Conversion, Pricing or Ecosystem. Almost never all seven at once."
       >
         {TOOLTIP_PHRASE}
       </AnimatedTooltip>
@@ -138,7 +175,7 @@ function SubWithTooltip() {
 
 /*
   Ambient light. Two large green washes drifting at different speeds, plus a
-  fine grain layer. Motivated: the reference's surfaces sit on a lit forest
+  fine grain layer. Motivated: the reference’s surfaces sit on a lit forest
   ground that falls off to near-black at the edges, and the grain is visible
   in it. This is that, in CSS, with no image to download and nothing that
   competes with the type.
@@ -183,9 +220,13 @@ function AmbientLight() {
 }
 
 /*
-  The mechanism, drawn. Each bar is one sales stage and its width is how much
-  volume survives that stage. The narrowing is the argument the whole page
-  makes, so it belongs in the first viewport rather than in a body paragraph.
+  The mechanism, drawn. Each bar is one link in the revenue chain and its
+  width is how much volume survives that link. The narrowing is the argument
+  the whole page makes, so it belongs in the first viewport rather than in a
+  body paragraph.
+
+  Seven bars rather than five, so the rhythm is tighter than the page’s usual
+  spacing: at the old gap this panel grew past the fold on a laptop.
 */
 function LeakPipeline() {
   const reduce = useReducedMotion();
@@ -206,12 +247,12 @@ function LeakPipeline() {
         className="absolute inset-x-0 top-0 h-px origin-left bg-signal/60"
       />
 
-      <p className="mb-7 text-[13px] text-muted">
-        A hundred conversations, five stages, one constriction.
+      <p className="mb-6 text-[13px] text-muted">
+        A hundred conversations, seven links, one constriction.
       </p>
 
-      <div className="flex flex-col gap-5">
-        {stages.map((s, i) => {
+      <div className="flex flex-col gap-3.5">
+        {links.map((s, i) => {
           const isLeak = s.id === "conversion";
           return (
             <div key={s.id}>
@@ -231,7 +272,7 @@ function LeakPipeline() {
                 />
               </div>
 
-              <div className="h-2.5 w-full overflow-hidden rounded-full bg-white/[0.055]">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-white/[0.055]">
                 <motion.div
                   initial={reduce ? false : { width: 0 }}
                   animate={{ width: `${s.flow}%` }}
@@ -266,9 +307,9 @@ function LeakPipeline() {
                   initial={reduce ? { opacity: 1 } : { opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.6, delay: 1.1 }}
-                  className="mt-2 text-[12px] text-signal/80"
+                  className="mt-1.5 text-[12px] text-signal/80"
                 >
-                  The most common leak, and the least served by software
+                  Where most founders are quietly losing the most money
                 </motion.p>
               )}
             </div>
@@ -284,11 +325,11 @@ function ScrollCue() {
 
   return (
     <motion.a
-      href="/#stages"
+      href="/#mechanism"
       initial={reduce ? { opacity: 1 } : { opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8, delay: 1.3 }}
-      aria-label="Scroll to the five stages"
+      aria-label="Scroll to the seven links"
       className="absolute bottom-7 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 text-muted transition-colors hover:text-signal md:flex"
     >
       <span className="text-[10px] uppercase tracking-[0.22em]">Scroll</span>

@@ -21,10 +21,9 @@ import { cn } from "@/lib/utils";
 
    The registry ships this as an AI agent console - token meters, retrieval
    logs, tool latency. The mechanics of the five visuals were kept and the
-   subject was rewritten, because the shapes happen to fit this page exactly:
-   five animated panels, and five sprints in lib/content.ts. So each card is
-   now one sprint, and the numbers inside it describe what that sprint
-   produces.
+   subject was rewritten, because the shapes happen to fit this page exactly.
+   So each card is now one link in the revenue chain, and the numbers inside
+   it describe what repairing that link produces.
 
    Also rethemed onto the palette in globals.css. The registry version used
    zinc surfaces with amber/violet/cyan accents; this file uses the ink scale
@@ -846,42 +845,47 @@ export function Card5() {
    Main Grid Component
 ───────────────────────────────────────────── */
 /*
-  One card per sprint, in the order the sprints appear in lib/content.ts. The
-  figures inside the visuals are illustrative, like the prices on the pricing
-  section - they show the shape of what a sprint produces, not a claim about
-  a particular client's numbers.
+  One card per link in the revenue chain, named as the links are named in
+  lib/content.ts. Five cards, not seven: Funnel and Ecosystem are argued
+  better in words than in a panel, and two more 260px tiles would push this
+  section past its welcome.
+
+  The figures inside the visuals are illustrative. They show the shape of
+  what a repair produces, not a claim about a particular client's numbers,
+  and nothing here should ever be read as a case study - the proof section
+  is the only place results belong.
 */
 const CARDS = [
   {
-    title: "Conversion Sprint",
+    title: "Conversion",
     description: "Discovery, pitch and follow-up drawn as one path, so a stall has a location.",
     visual: <Card1 />,
     colSpan: "lg:col-span-1",
     height: "h-[260px]",
   },
   {
-    title: "Offer Sprint",
+    title: "Pricing",
     description: "Price architecture, scope and guarantee, measured against what you discount.",
     visual: <Card2 />,
     colSpan: "lg:col-span-1",
     height: "h-[260px]",
   },
   {
-    title: "Message Sprint",
+    title: "Message",
     description: "Six competing angles, tagged on the way out so one of them can win.",
     visual: <Card3 />,
     colSpan: "lg:col-span-1",
     height: "h-[260px]",
   },
   {
-    title: "Demand Sprint",
+    title: "Leads",
     description: "Channels instrumented to report revenue by source, not leads by source.",
     visual: <Card4 />,
     colSpan: "lg:col-span-2",
     height: "h-[260px]",
   },
   {
-    title: "Retention Sprint",
+    title: "Ecosystem",
     description: "The sequences after the signature, where the cheapest revenue lives.",
     visual: <Card5 />,
     colSpan: "lg:col-span-1",
