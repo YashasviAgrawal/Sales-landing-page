@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="760" viewBox="0 0 600 760">
+  <!--
+    Mirror of funnel-left.svg, for the opposite side of the footer. See that
+    file for why the art is dark ink on a white field rather than the reverse
+    - the sampler drops bright cells and draws dark ones.
+
+    This one runs the other way up: a narrow neck opening back out. Read as a
+    pair, the two sides are the same system before and after the repair.
+  -->
+  <defs>
+    <linearGradient id="rise" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#0a0a0a"/>
+      <stop offset="0.45" stop-color="#2e2e2e"/>
+      <stop offset="0.78" stop-color="#565656"/>
+      <stop offset="1" stop-color="#6e6e6e"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="760" fill="#ffffff"/>
+
+  <path
+    d="M272 20 H328 V130 H272 Z
+       M260 170 H340 L374 290 H226 Z
+       M208 330 H392 L450 470 H150 Z
+       M130 510 H470 L560 690 H40 Z"
+    fill="url(#rise)"/>
+
+  <g fill="#4a4a4a">
+    <circle cx="96" cy="468" r="13"/>
+    <circle cx="58" cy="420" r="9"/>
+    <circle cx="120" cy="400" r="7"/>
+    <circle cx="504" cy="468" r="13"/>
+    <circle cx="542" cy="420" r="9"/>
+    <circle cx="480" cy="400" r="7"/>
+    <circle cx="172" cy="274" r="11"/>
+    <circle cx="132" cy="224" r="8"/>
+    <circle cx="428" cy="274" r="11"/>
+    <circle cx="468" cy="224" r="8"/>
+  </g>
+</svg>

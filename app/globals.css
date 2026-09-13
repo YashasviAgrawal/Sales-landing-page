@@ -1,0 +1,329 @@
+@import "tailwindcss";
+
+/*
+  Tailwind v4 resolves `dark:` against prefers-color-scheme by default. This
+  site has no light mode - the palette below is the only one - but components
+  pulled in from the shadcn registry are written for both and carry paired
+  `bg-x dark:bg-y` classes. Left on the media query, those would flip to their
+  light halves on a visitor whose OS is set to light, which is most of them.
+
+  Switching to the class strategy and marking <html class="dark"> pins them to
+  the dark half unconditionally, and keeps the standard escape hatch if a
+  light theme is ever wanted.
+*/
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+  SALES BRAIN - DESIGN SYSTEM
+  Structural language borrowed from the reference:
+  green-black base, one mint accent, oversized display type,
+  hairline dividers instead of card chrome, restrained scroll motion.
+  Colour outside the green family is reserved for direction of travel.
+  All code below is original. No purchased template assets are used.
+
+  Shape rule (locked): interactive elements are full pill,
+  surfaces and panels are 12px. Nothing else.
+*/
+
+@theme {
+  /* Base - green-black. The reference's cards and ground are not neutral
+     grey; they keep the green in them, which is what makes the mint read as
+     light coming off the surface rather than paint laid on it. Never #000. */
+  --color-ink-950: #060d0a;
+  --color-ink-900: #0b1611;
+  --color-ink-850: #101d17;
+  --color-ink-800: #16261e;
+  --color-ink-700: #21362b;
+
+  /* Text - near-white for figures, green-grey as it steps back. */
+  --color-paper: #eaf2ed;
+  --color-body: #9daea5;
+  --color-muted: #64756b;
+
+  /* Single accent - mint. Unlike the violet it replaces, one value covers
+     both jobs: 11.1:1 as type on the ground, and the same 11.1:1 the other
+     way round as a fill under ink. That symmetry is why the two-role split
+     is gone. It does mean fills carry dark text, never white - mint under
+     white is 1.8:1 and unreadable. */
+  --color-signal: #3ddc97;
+  --color-signal-lift: #6ae9b4;
+  --color-signal-deep: #0f5c3d;
+
+  /* The lit forest green the reference's surfaces sit on, falling off to
+     near-black at the edges. Ambient washes only. Never type, never a
+     control. */
+  --color-aura: #0f7a4f;
+
+  /* Direction of travel. The reference marks every rise in the accent mint
+     itself, so rise is the accent; fall borrows the magenta it draws its
+     second data series in. The only two non-green values in the system. */
+  --color-rise: #3ddc97;
+  --color-fall: #e879f9;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --radius-surface: 12px;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+
+  body {
+    background-color: var(--color-ink-950);
+    color: var(--color-paper);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss01", "cv01";
+  }
+
+  ::selection {
+    background-color: var(--color-signal);
+    color: var(--color-ink-950);
+  }
+
+  /*
+    The native pointer is suppressed only while <AnimatedCursor> is actually
+    mounted and drawing - it adds this class itself and removes it on unmount.
+    Gated on a fine pointer and the md breakpoint so it matches exactly the
+    conditions under which the drawn cursor renders; under
+    prefers-reduced-motion the component returns null, the class is never
+    added, and the ordinary cursor is untouched.
+  */
+  @media (min-width: 768px) and (pointer: fine) {
+    html.has-custom-cursor,
+    html.has-custom-cursor *,
+    html.has-custom-cursor *::before,
+    html.has-custom-cursor *::after {
+      cursor: none;
+    }
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 3px;
+  }
+}
+
+@layer utilities {
+  .hairline {
+    border-color: rgb(255 255 255 / 0.09);
+  }
+
+  /*
+    THE VERTICAL RHYTHM. One token, every section.
+
+    A section boundary is the SUM of two paddings, which is the thing that
+    goes wrong when each section picks its own: `py-24` on both sides of a
+    seam is not 96px of air, it is 192px, and eleven seams of that is roughly
+    2,000px of empty scroll on a page whose whole problem was length.
+
+    So this is sized for the seam, not for one side of it:
+
+      mobile   36 + 40 =  76px
+      desktop  52 + 64 = 116px
+
+    Asymmetric on purpose - more room below a divider than above it. What
+    follows a seam is always a large display heading and needs the lead-in;
+    what precedes it is body text, which does not. The 12px difference is
+    invisible as lopsidedness on the tinted sections and legible as
+    hierarchy everywhere else.
+
+    Anything that needs to break this rule should say why in a comment
+    rather than quietly hand-rolling another `py-*`.
+  */
+  .section-y {
+    padding-top: 2.5rem;
+    padding-bottom: 2.25rem;
+  }
+  @media (min-width: 768px) {
+    .section-y {
+      padding-top: 4rem;
+      padding-bottom: 3.25rem;
+    }
+  }
+
+  .display-tight {
+    letter-spacing: -0.035em;
+    line-height: 1.02;
+  }
+
+  /* Marquee track. Two rows, running against each other. */
+  .marquee-track {
+    animation: marquee-slide 42s linear infinite;
+  }
+  .marquee-track-reverse {
+    animation: marquee-slide 54s linear infinite reverse;
+  }
+  .marquee-pause:hover .marquee-track,
+  .marquee-pause:hover .marquee-track-reverse {
+    animation-play-state: paused;
+  }
+  @keyframes marquee-slide {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  /*
+    Fine grain over the hero. Motivated: a large green wash is exactly the
+    case where cheap panels band, and the reference's ground is visibly
+    grained rather than smooth. About 400 bytes.
+  */
+  .grain {
+    opacity: 0.32;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+    animation: grain-shift 8s steps(6) infinite;
+  }
+  @keyframes grain-shift {
+    0% {
+      transform: translate3d(0, 0, 0);
+    }
+    20% {
+      transform: translate3d(-4%, 2%, 0);
+    }
+    40% {
+      transform: translate3d(3%, -3%, 0);
+    }
+    60% {
+      transform: translate3d(-2%, 4%, 0);
+    }
+    80% {
+      transform: translate3d(4%, 1%, 0);
+    }
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  /*
+    Ambient washes. Defined here rather than inline in each component so that
+    every colour in the system resolves from the tokens above and nothing has
+    to be re-found when the palette moves. The components animate position
+    only; the paint is all here.
+  */
+  .wash-hero-near {
+    background: radial-gradient(
+      900px 520px at 12% -8%,
+      color-mix(in srgb, var(--color-aura) 55%, transparent),
+      color-mix(in srgb, var(--color-signal) 7%, transparent) 34%,
+      transparent 64%
+    );
+  }
+  .wash-hero-far {
+    background: radial-gradient(
+      680px 460px at 88% 18%,
+      color-mix(in srgb, var(--color-aura) 30%, transparent),
+      transparent 60%
+    );
+  }
+  .wash-book {
+    background: radial-gradient(
+      700px 420px at 78% 0%,
+      color-mix(in srgb, var(--color-aura) 40%, transparent),
+      color-mix(in srgb, var(--color-signal) 5%, transparent) 40%,
+      transparent 64%
+    );
+  }
+  .wash-close {
+    background: radial-gradient(
+      760px 420px at 50% 120%,
+      color-mix(in srgb, var(--color-signal) 20%, transparent),
+      color-mix(in srgb, var(--color-aura) 42%, transparent) 38%,
+      transparent 68%
+    );
+  }
+
+  /*
+    A photograph on this page must not arrive as a bright rectangle stuck to
+    a dark one. This dissolves its edges into the ground instead, so the image
+    emerges from the page rather than sitting on top of it - which is why the
+    audit photograph carries no border and needs none.
+  */
+  .vignette-photo {
+    background: radial-gradient(
+      118% 82% at 50% 44%,
+      transparent 28%,
+      color-mix(in srgb, var(--color-ink-950) 78%, transparent) 74%,
+      var(--color-ink-950) 100%
+    );
+  }
+
+  /*
+    The one place the photograph is sharp gets the one colour the site owns.
+    Sized and positioned onto the lens itself, screened so it reads as light
+    in the glass rather than paint over it.
+  */
+  .lens-glow {
+    background: radial-gradient(
+      52% 34% at 51% 46%,
+      color-mix(in srgb, var(--color-signal) 30%, transparent),
+      color-mix(in srgb, var(--color-aura) 15%, transparent) 52%,
+      transparent 72%
+    );
+  }
+
+  /* The pale sweep that crosses the hero once every few seconds. */
+  .wash-sweep {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--color-paper) 3.5%, transparent),
+      transparent
+    );
+  }
+
+  /*
+    Hatched fill. The reference fills its small bars with banded gradient
+    rather than a flat block, which reads as "measured so far" instead of
+    "this is the value". Mint bands over a dark forest base, as there. Pure
+    gradient, so it scales with the bar and costs nothing.
+  */
+  .hatch {
+    background-color: var(--color-signal-deep);
+    background-image: repeating-linear-gradient(
+      -45deg,
+      var(--color-signal) 0 3px,
+      color-mix(in srgb, var(--color-signal) 42%, transparent) 3px 6px
+    );
+  }
+
+  /* Nav link underline that draws in from the left on hover. */
+  .link-underline {
+    position: relative;
+  }
+  .link-underline::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    height: 1px;
+    width: 100%;
+    transform: scaleX(0);
+    transform-origin: left;
+    background-color: var(--color-signal);
+    transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  .link-underline:hover::after,
+  .link-underline:focus-visible::after {
+    transform: scaleX(1);
+  }
+}
