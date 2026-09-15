@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { brand } from "@/lib/content";
 import { WordReveal } from "@/components/ui/word-reveal";
@@ -12,8 +13,28 @@ export default function NotFound() {
   return (
     <main className="flex min-h-[100dvh] items-center justify-center px-5 py-24">
       <div className="mx-auto w-full max-w-[54ch] text-center">
+        {/* This is the only page that renders without the header, so the mark
+            has to carry the branding on its own - and it doubles as the first
+            way back, above the two CTAs below. */}
         <Reveal>
-          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-signal">
+          <Link
+            href="/"
+            aria-label={`${brand.name} home`}
+            className="inline-flex transition-opacity hover:opacity-80"
+          >
+            <Image
+              src="/brand/mark.png"
+              alt=""
+              width={256}
+              height={219}
+              priority
+              className="h-10 w-auto"
+            />
+          </Link>
+        </Reveal>
+
+        <Reveal delay={0.05}>
+          <p className="mt-8 font-mono text-[11px] uppercase tracking-[0.2em] text-signal">
             404
           </p>
         </Reveal>

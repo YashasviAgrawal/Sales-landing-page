@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
 import { ArrowRight } from "@phosphor-icons/react";
@@ -71,7 +72,21 @@ export function Footer() {
 
       <div className="mx-auto grid w-full max-w-[1240px] grid-cols-1 gap-10 px-5 py-12 md:grid-cols-12 md:px-8">
         <Reveal className="md:col-span-5">
-          <p className="text-[1.5rem] font-medium tracking-tight">{brand.name}</p>
+          {/* Same lockup as the header, one step larger to sit with the
+              1.5rem name. The mark closes the page where the header opens
+              it. */}
+          <div className="flex items-center gap-3">
+            <Image
+              src="/brand/mark.png"
+              alt=""
+              width={256}
+              height={219}
+              className="h-8 w-auto"
+            />
+            <p className="text-[1.5rem] font-medium tracking-tight">
+              {brand.name}
+            </p>
+          </div>
           {/* The positioning line, verbatim, in the last place it can be read.
               The hero opens on it and the footer closes on it; saying it two
               different ways is what makes a position stop landing. */}
