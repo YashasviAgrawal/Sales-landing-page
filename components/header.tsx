@@ -32,10 +32,13 @@ export function Header() {
           : "border-b border-transparent"
       }`}
     >
-      <div className="mx-auto flex h-[68px] w-full max-w-[1240px] items-center justify-between px-5 md:px-8">
+      <div className="mx-auto flex h-[68px] w-full max-w-[1240px] items-center justify-between gutter-x">
+        {/* The negative margin cancels the padding, so the lockup sits exactly
+            where it did while the tap area covers the full 44px a thumb needs
+            rather than the 28px the mark and its label happen to occupy. */}
         <motion.a
           href="/#top"
-          className="group flex items-center gap-2.5"
+          className="group -my-2 flex items-center gap-2.5 py-2"
           whileHover={reduce ? undefined : { x: 2 }}
           transition={{ type: "spring", stiffness: 320, damping: 22 }}
         >
@@ -66,12 +69,16 @@ export function Header() {
           >
             {hero.navCta}
           </motion.a>
+          {/* 44px square. This is the only control on a phone that opens the
+              nav, and at p-2 it was a 36px circle - under every platform's
+              minimum and noticeably fiddly next to the screen edge. The icon
+              is unchanged; the button grew around it. */}
           <button
             type="button"
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
-            className="rounded-full border hairline p-2 text-paper lg:hidden"
+            className="grid h-11 w-11 place-items-center rounded-full border hairline text-paper transition-colors duration-200 active:bg-white/10 lg:hidden"
           >
             {open ? <X size={18} weight="bold" /> : <List size={18} weight="bold" />}
           </button>
@@ -97,7 +104,7 @@ export function Header() {
                   transition: { staggerChildren: reduce ? 0 : 0.05 },
                 },
               }}
-              className="mx-auto flex max-w-[1240px] flex-col px-5 py-3"
+              className="mx-auto flex max-w-[1240px] flex-col gutter-x py-3"
             >
               {nav.map((item) => (
                 <motion.a

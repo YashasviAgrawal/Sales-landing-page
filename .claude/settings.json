@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash('C:/Program Files/Google/Chrome/Application/chrome.exe' --headless=new --disable-gpu --no-sandbox --hide-scrollbars --user-data-dir=C:/Users/asus/AppData/Local/Temp/claude/c--Users-asus-Downloads-salesbrain-landing--1--salesbrain/9cf4c13b-d3f7-44b2-94f3-b95b92a9ef34/scratchpad/cud4 --remote-debugging-port=9223 about:blank)",
+      "Bash(curl -s http://127.0.0.1:9223/json/version)",
+      "Bash(curl -s -o /dev/null -w \"dev server: %{http_code}\\\\n\" --max-time 8 http://127.0.0.1:3000/)"
+    ]
+  }
+}

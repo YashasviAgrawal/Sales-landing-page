@@ -53,7 +53,7 @@ export function Call() {
     <section id="call" className="section-y scroll-mt-24">
       <div
         ref={ref}
-        className="mx-auto grid w-full max-w-[1240px] grid-cols-1 gap-10 px-5 md:px-8 lg:grid-cols-12 lg:gap-14"
+        className="mx-auto grid w-full max-w-[1240px] grid-cols-1 gap-10 gutter-x lg:grid-cols-12 lg:gap-14"
       >
         <div className="lg:col-span-5">
           <div className="lg:sticky lg:top-28">

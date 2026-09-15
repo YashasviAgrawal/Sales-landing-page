@@ -70,7 +70,7 @@ export function Footer() {
         />
       </div>
 
-      <div className="mx-auto grid w-full max-w-[1240px] grid-cols-1 gap-10 px-5 py-12 md:grid-cols-12 md:px-8">
+      <div className="mx-auto grid w-full max-w-[1240px] grid-cols-1 gap-10 gutter-x py-12 md:grid-cols-12">
         <Reveal className="md:col-span-5">
           {/* Same lockup as the header, one step larger to sit with the
               1.5rem name. The mark closes the page where the header opens
@@ -99,7 +99,7 @@ export function Footer() {
           <p className="mt-8 text-[14px] text-muted">{brand.city}</p>
           <a
             href={`mailto:${brand.email}`}
-            className="link-underline mt-1 inline-block text-[14px] text-body transition-colors hover:text-signal"
+            className="link-underline tap-area mt-1 inline-block text-[14px] text-body transition-colors hover:text-signal"
           >
             {brand.email}
           </a>
@@ -107,12 +107,14 @@ export function Footer() {
 
         <Reveal className="md:col-span-3" delay={0.08}>
           <p className="text-[13px] text-muted">Page</p>
-          <ul className="mt-5 flex flex-col gap-3">
+          {/* gap-4 rather than gap-3 so a 34px tap band fits between rows
+              without the bands overlapping. */}
+          <ul className="mt-5 flex flex-col gap-4">
             {nav.map((n) => (
               <li key={n.href}>
                 <a
                   href={n.href}
-                  className="link-underline text-[15px] text-body transition-colors hover:text-paper"
+                  className="link-underline tap-area [--tap:34px] text-[15px] text-body transition-colors hover:text-paper"
                 >
                   {n.label}
                 </a>
@@ -189,21 +191,23 @@ export function Footer() {
       </div>
 
       <div className="border-t hairline">
-        <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-3 px-5 py-7 text-[13px] text-muted sm:flex-row sm:items-center sm:justify-between md:px-8">
+        <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-3 gutter-x py-7 text-[13px] text-muted sm:flex-row sm:items-center sm:justify-between">
           <p>
             &copy; {new Date().getFullYear()} {brand.name}. All rights reserved.
           </p>
-          {/* Both routes exist now. They used to be dead links. */}
+          {/* Both routes exist now. They used to be dead links.
+              Side by side with no rows above or below, so these can carry a
+              full 44px band. */}
           <div className="flex gap-6">
             <Link
               href="/terms"
-              className="link-underline transition-colors hover:text-body"
+              className="link-underline tap-area transition-colors hover:text-body"
             >
               Terms
             </Link>
             <Link
               href="/privacy"
-              className="link-underline transition-colors hover:text-body"
+              className="link-underline tap-area transition-colors hover:text-body"
             >
               Privacy
             </Link>

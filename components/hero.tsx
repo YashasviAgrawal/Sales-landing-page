@@ -40,7 +40,7 @@ export function Hero() {
 
       <motion.div
         style={{ opacity: fade }}
-        className="relative mx-auto grid min-h-[calc(100dvh-10rem)] w-full max-w-[1240px] grid-cols-1 items-center gap-14 px-5 md:px-8 lg:grid-cols-12 lg:gap-10"
+        className="relative mx-auto grid min-h-[calc(100dvh-10rem)] w-full max-w-[1240px] grid-cols-1 items-center gap-14 gutter-x lg:grid-cols-12 lg:gap-10"
       >
         <motion.div style={{ y: copyY }} className="lg:col-span-6">
           <motion.p

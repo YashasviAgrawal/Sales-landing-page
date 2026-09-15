@@ -92,11 +92,45 @@
     }
   }
 
+  /*
+    Nothing on this page is meant to scroll sideways, but the reveal
+    animations translate on the x axis before they play: a `RevealItem` with
+    direction="left" sits 22px off its resting position until it enters the
+    viewport, and where the element already reaches the content edge - the
+    numbered list in the Call section is the one that did it - those 22px
+    push 2px past a 320-390px viewport. The page then rubber-bands sideways
+    on iOS for no visible reason, because the thing causing it is invisible
+    until you scroll to it.
+
+    `clip` rather than `hidden` on purpose. `overflow-x: hidden` forces the
+    other axis to `auto`, which turns the root into a scroll container and
+    breaks `position: sticky` - and the Call section's photograph is sticky
+    on large screens. `clip` creates no scroll container, so sticky, smooth
+    scrolling and the scroll-spy all keep working.
+  */
+  html {
+    overflow-x: clip;
+  }
+
   body {
     background-color: var(--color-ink-950);
     color: var(--color-paper);
     -webkit-font-smoothing: antialiased;
     font-feature-settings: "ss01", "cv01";
+  }
+
+  /*
+    The grey flash iOS paints over a tapped link is the wrong colour on a
+    black page and lands on whole rows, not just buttons. Removed in favour
+    of the components' own active states. `touch-action: manipulation` drops
+    the 300ms double-tap-to-zoom delay, so taps register immediately.
+  */
+  a,
+  button,
+  [role="button"],
+  summary {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
 
   ::selection {
@@ -124,6 +158,31 @@
   :focus-visible {
     outline: 2px solid var(--color-signal);
     outline-offset: 3px;
+  }
+}
+
+/*
+  iOS Safari zooms the whole page in when a focused form control has a
+  font-size under 16px, and does not zoom back out on blur. Every field on
+  this site was 15px, so tapping the booking form or the newsletter box left
+  the reader at roughly 1.2x with the layout shoved off-screen and no way
+  back except a manual pinch.
+
+  16px is the threshold, not a preference. It is one pixel off the design
+  value, and only below md, so nothing about the desktop typography changes.
+
+  UNLAYERED ON PURPOSE - do not move this inside `@layer base`. The fields
+  set their size with a Tailwind utility (`text-[15px]`), and utilities are a
+  later layer than base, so a base rule loses to them no matter how specific
+  it is; that is exactly what happened on the first attempt at this fix.
+  Declarations outside any layer beat every layered one, which is what makes
+  this hold without an `!important`.
+*/
+@media (max-width: 767px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
   }
 }
 
@@ -172,6 +231,31 @@
     .section-y {
       padding-top: 6rem;
       padding-bottom: 5rem;
+    }
+  }
+
+  /*
+    THE HORIZONTAL GUTTER. One token, every section - the same argument as
+    .section-y above, and it replaces the `px-5 md:px-8` that was repeated in
+    twelve places.
+
+    The values are the ones it replaces: 20px, 32px from md up. What it adds
+    is the safe-area floor. A notched phone held in landscape puts the cutout
+    over one of the long edges and reports it as env(safe-area-inset-left/
+    right) - around 44px, more than double the gutter - so a fixed header or
+    a line of body text with a flat 20px padding runs underneath it. `max()`
+    keeps the designed gutter everywhere it is enough and only grows it on
+    the edge the OS says is obstructed. The insets are 0 on every device
+    without a cutout, so this is a no-op on the vast majority of screens.
+  */
+  .gutter-x {
+    padding-left: max(1.25rem, env(safe-area-inset-left));
+    padding-right: max(1.25rem, env(safe-area-inset-right));
+  }
+  @media (min-width: 768px) {
+    .gutter-x {
+      padding-left: max(2rem, env(safe-area-inset-left));
+      padding-right: max(2rem, env(safe-area-inset-right));
     }
   }
 
@@ -354,6 +438,34 @@
       var(--color-signal) 0 3px,
       color-mix(in srgb, var(--color-signal) 42%, transparent) 3px 6px
     );
+  }
+
+  /*
+    Grows a small control's touch target without moving anything on screen.
+
+    The footer's links are 19-21px tall, because that is how tall a line of
+    15px type is. That reads fine and taps badly, and it is under the 24px
+    WCAG 2.5.8 asks for. Padding would fix the target and move the layout -
+    and on anything carrying .link-underline it would also drag the hover
+    underline away from the text, since that rule hangs 5px off the bottom of
+    the box.
+
+    An absolutely positioned ::before takes no part in layout, so the target
+    grows and nothing shifts. The band is centred on the control and its
+    height is `--tap`, which has to be set per case: a vertical list needs a
+    band no taller than the distance between its rows, or neighbouring bands
+    overlap and the lower link quietly swallows taps meant for the one above.
+  */
+  .tap-area {
+    position: relative;
+  }
+  .tap-area::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: 50%;
+    translate: 0 -50%;
+    block-size: var(--tap, 44px);
   }
 
   /* Nav link underline that draws in from the left on hover. */

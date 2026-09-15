@@ -24,7 +24,7 @@ import { fixes } from "@/lib/content";
 export function Fixes() {
   return (
     <section className="section-y border-t hairline">
-      <div className="mx-auto w-full max-w-[1240px] px-5 md:px-8">
+      <div className="mx-auto w-full max-w-[1240px] gutter-x">
         <h2 className="display-tight max-w-[20ch] text-3xl font-medium sm:text-5xl lg:text-[3.4rem]">
           <StaggerText>{fixes.heading}</StaggerText>
         </h2>

@@ -13,7 +13,7 @@ export function Faq() {
 
   return (
     <section id="faq" className="section-y scroll-mt-24 border-t hairline">
-      <div className="mx-auto grid w-full max-w-[1240px] grid-cols-1 gap-12 px-5 md:px-8 lg:grid-cols-12">
+      <div className="mx-auto grid w-full max-w-[1240px] grid-cols-1 gap-12 gutter-x lg:grid-cols-12">
         <div className="lg:col-span-4">
           <div className="lg:sticky lg:top-28">
             <WordReveal

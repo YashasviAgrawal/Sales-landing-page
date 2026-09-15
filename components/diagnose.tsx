@@ -57,7 +57,7 @@ export function Diagnose() {
      top of it as well draws the section as an inset box. */
   return (
     <section id="diagnose" className="section-y scroll-mt-24 bg-ink-900">
-      <div className="mx-auto w-full max-w-[1240px] px-5 md:px-8">
+      <div className="mx-auto w-full max-w-[1240px] gutter-x">
         <WordReveal
           text={symptomCheck.heading}
           highlight="one of these is true."
@@ -148,7 +148,10 @@ function Chart({
             <div
               role="radiogroup"
               aria-label={p.text}
-              className="flex shrink-0 gap-1.5 pl-[26px] sm:pl-0"
+              /* flex-wrap is a safety net, not a layout: the row fits at
+                 320px, but a wider font fallback would otherwise push the
+                 third option off the screen instead of onto a second line. */
+              className="flex flex-wrap gap-1.5 pl-[26px] sm:flex-nowrap sm:pl-0 sm:shrink-0"
             >
               {symptomCheck.scale.map((label, weight) => {
                 const on = chosen === weight;
@@ -173,7 +176,18 @@ function Chart({
                     onClick={() => onAnswer(p.linkId, weight)}
                     whileTap={reduce ? undefined : { scale: 0.95 }}
                     transition={{ type: "spring", stiffness: 380, damping: 24 }}
-                    className={`rounded-full border px-3 py-1.5 text-[12px] transition-colors duration-200 ${skin}`}
+                    /* The symptom checker is the one thing on this page a
+                       reader is asked to operate, and on a phone it is
+                       operated with a thumb. These were 32px tall - below
+                       every platform's minimum for a tap target, in a row of
+                       three.
+
+                       Height only: the three labels plus their gaps already
+                       come to 246px of the 254px a 320px screen has left
+                       after the indent, so widening the padding would push
+                       the row off the edge. Growing them downward costs
+                       nothing horizontally. */
+                    className={`inline-flex min-h-11 items-center justify-center rounded-full border px-3 text-[12px] transition-colors duration-200 sm:min-h-0 sm:py-1.5 ${skin}`}
                   >
                     {label}
                   </motion.button>

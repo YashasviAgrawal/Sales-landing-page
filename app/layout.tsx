@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
@@ -23,6 +23,29 @@ export const metadata: Metadata = {
     title: "Your revenue isn’t broken everywhere. It’s broken in one place.",
   },
   robots: { index: true, follow: true },
+};
+
+/*
+  Mobile browser chrome. Without a theme colour, Chrome on Android draws its
+  address bar in its own default and iOS Safari tints its bars from the top
+  of the page - so a site whose ground is #000000 arrived framed in grey.
+  Matching it to the ink makes the page run to the edges of the device.
+
+  `colorScheme: "dark"` is the other half: it tells the browser to render the
+  things the stylesheet does not own - form-field autofill, the caret,
+  scrollbars, the tap-and-hold menus - from its dark set rather than
+  dropping a white autofill box into the booking form.
+
+  Deliberately no `maximumScale` or `userScalable: false`. Pinch-zoom is an
+  accessibility guarantee, and the usual reason people disable it - iOS
+  zooming the page when a small input is focused - is fixed properly in
+  globals.css by giving the fields a 16px font size.
+
+  Width and initial scale are Next's defaults and are already correct.
+*/
+export const viewport: Viewport = {
+  themeColor: "#000000",
+  colorScheme: "dark",
 };
 
 const faqJsonLd = {

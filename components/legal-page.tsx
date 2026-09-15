@@ -21,7 +21,7 @@ export function LegalPage({
       <Header />
       <main>
         <section className="border-b hairline pt-40 pb-20 md:pt-48">
-          <div className="mx-auto w-full max-w-[1240px] px-5 md:px-8">
+          <div className="mx-auto w-full max-w-[1240px] gutter-x">
             <WordReveal
               as="h1"
               trigger="mount"
@@ -35,7 +35,7 @@ export function LegalPage({
         </section>
 
         <section className="py-20 md:py-28">
-          <div className="mx-auto w-full max-w-[1240px] px-5 md:px-8">
+          <div className="mx-auto w-full max-w-[1240px] gutter-x">
             <ol className="flex max-w-[68ch] flex-col gap-12">
               {sections.map((s, i) => (
                 <Reveal key={s.h} delay={0.04 * i}>

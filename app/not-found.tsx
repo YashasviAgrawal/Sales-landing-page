@@ -11,7 +11,7 @@ import { MagneticCta } from "@/components/ui/magnetic-cta";
 */
 export default function NotFound() {
   return (
-    <main className="flex min-h-[100dvh] items-center justify-center px-5 py-24">
+    <main className="flex min-h-[100dvh] items-center justify-center gutter-x py-24">
       <div className="mx-auto w-full max-w-[54ch] text-center">
         {/* This is the only page that renders without the header, so the mark
             has to carry the branding on its own - and it doubles as the first

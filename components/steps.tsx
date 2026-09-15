@@ -41,7 +41,7 @@ export function Steps() {
 
   return (
     <section id="how" className="section-y scroll-mt-24 border-t hairline">
-      <div className="mx-auto w-full max-w-[1240px] px-5 md:px-8">
+      <div className="mx-auto w-full max-w-[1240px] gutter-x">
         <WordReveal
           text={steps.heading}
           highlight="Scale."

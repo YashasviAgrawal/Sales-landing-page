@@ -97,7 +97,7 @@ export function Book() {
         transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      <div className="relative mx-auto grid w-full max-w-[1240px] grid-cols-1 gap-10 px-5 md:px-8 lg:grid-cols-12 lg:gap-14">
+      <div className="relative mx-auto grid w-full max-w-[1240px] grid-cols-1 gap-10 gutter-x lg:grid-cols-12 lg:gap-14">
         <div className="lg:col-span-5">
           <WordReveal
             text={book.heading}
@@ -128,7 +128,7 @@ export function Book() {
             <p className="mt-7 text-[14px] text-muted">{brand.city}</p>
             <a
               href={`mailto:${brand.email}`}
-              className="link-underline mt-1 inline-block text-[14px] text-body transition-colors hover:text-signal"
+              className="link-underline tap-area mt-1 inline-block text-[14px] text-body transition-colors hover:text-signal"
             >
               {brand.email}
             </a>
