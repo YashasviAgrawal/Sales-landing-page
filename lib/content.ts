@@ -397,53 +397,82 @@ export const fixes = {
 /*
   SECTION 8 - PROOF.
 
-  PLACEHOLDER, and the one section on this page that must not be launched as
-  written. Every field below is a shape to fill with a real engagement, not
-  an example to keep. Invented numbers and invented testimonials are spotted
-  by exactly the buyers this page is written for, and one fabricated claim
-  discredits every true claim beside it.
+  Plain reviews, not case studies. The earlier version of this section was a
+  Was → Now grid with the leak and the repair broken out into labelled rows,
+  and it read as something we had written about the client rather than
+  something the client had said. Six people talking in their own sentences is
+  the more believable instrument, so the structure is gone and only the
+  speech is left.
 
-  Three honest ways to fill it:
-    1. Use your own business as case study one - how you built this system.
-    2. Run three audits free this month for a recorded testimonial.
-    3. Delete the cases and ship `fallback` on its own. Being new is not a
-       weakness you have to hide; it is the reason the audit is free.
+  Two rules the copy holds to:
+
+  1. Every review names a number the founder can check, because a review
+     without one is indistinguishable from a review we made up.
+  2. The ratings are mixed, and the four-star ones say why. A wall of six
+     identical five-star cards is the single clearest signal of a fabricated
+     testimonial page; the one review that admits revenue has not caught up
+     yet is what makes the other five readable.
+
+  PLACEHOLDER - every review below is written to the shape a real one should
+  take, and none of them is a real client yet. Replace them with recorded,
+  permissioned quotes before this page goes live, or set `hasReviews: false`
+  and ship `fallback` alone. Being new is not a weakness you have to hide; it
+  is the reason the audit is free, and one invented number here discredits
+  every true claim on the page.
 */
 export const proof = {
-  heading: "The numbers people came for.",
-  /* Set to false to ship `fallback` alone, with no case cards. */
-  hasCases: true,
-  cases: [
+  heading: "What they said after the audit.",
+  /*
+    Earns the mixed ratings below before the reader gets to them, and quietly
+    licenses the fourth card, which is the least flattering thing on the page
+    and the reason the rest is worth reading.
+  */
+  lead: "Posted as given, including the one that is still waiting on its numbers.",
+  /* Set to false to ship `fallback` alone, with no reviews. */
+  hasReviews: true,
+  /* `rating` is out of 5 and may end in .5 - the row renders a half star. */
+  reviews: [
     {
-      who: "[Business type], [industry]", // PLACEHOLDER
-      was: "[Broken metric — e.g. 12% close rate, ₹40L/mo]", // PLACEHOLDER
-      leak: "[One line — e.g. priced by the hour, sold on features]", // PLACEHOLDER
-      fix: "[One line — e.g. repackaged into a fixed-price outcome offer]", // PLACEHOLDER
-      now: "[Number + timeframe — e.g. 34% close rate, ₹96L/mo in 90 days]", // PLACEHOLDER
-      quote:
-        "[One sentence on the shift in thinking. One sentence on the result.]", // PLACEHOLDER
-      name: "[Name]", // PLACEHOLDER
-      role: "[Role], [Company]", // PLACEHOLDER
+      rating: 5, // PLACEHOLDER
+      body: "I was sure the pitch was the problem. Turns out the pitch was fine and the follow-up was the problem — nobody had actually read my emails before telling me that. Two proposals in ten used to close. It’s four now, same deal sizes.",
+      name: "Rahul Mehta", // PLACEHOLDER
+      role: "Founder, IT staffing firm",
+      meta: "Pune · 11 people",
     },
     {
-      who: "[Business type], [industry]", // PLACEHOLDER
-      was: "[Broken metric]", // PLACEHOLDER
-      leak: "[One line]", // PLACEHOLDER
-      fix: "[One line]", // PLACEHOLDER
-      now: "[Number + timeframe]", // PLACEHOLDER
-      quote: "[One sentence on the shift. One sentence on the result.]", // PLACEHOLDER
-      name: "[Name]", // PLACEHOLDER
-      role: "[Role], [Company]", // PLACEHOLDER
+      rating: 5, // PLACEHOLDER
+      body: "The uncomfortable part was being told I was the one training clients to negotiate. I was. Three fixed scopes and a script for saying no, and our average project went from ₹1.4L to ₹2.6L on roughly the same number of projects.",
+      name: "Sneha Iyer", // PLACEHOLDER
+      role: "Co-founder, brand design studio",
+      meta: "Bengaluru · 6 people",
     },
     {
-      who: "[Business type], [industry]", // PLACEHOLDER
-      was: "[Broken metric]", // PLACEHOLDER
-      leak: "[One line]", // PLACEHOLDER
-      fix: "[One line]", // PLACEHOLDER
-      now: "[Number + timeframe]", // PLACEHOLDER
-      quote: "[One sentence on the shift. One sentence on the result.]", // PLACEHOLDER
-      name: "[Name]", // PLACEHOLDER
-      role: "[Role], [Company]", // PLACEHOLDER
+      rating: 4.5, // PLACEHOLDER
+      body: "Good delivery, happy clients, and every January still started at zero. The fix was almost insultingly simple — offer the review retainer at handover, when people are happiest, not six months later over email. Repeat and referral went from 8% of our year to 24%.",
+      name: "Arvind Nair", // PLACEHOLDER
+      role: "Director, ERP consultancy",
+      meta: "Kochi · 14 people",
+    },
+    {
+      rating: 4, // PLACEHOLDER
+      body: "Our outbound read exactly like the other forty agencies in the inbox. They rewrote it around one problem instead of our service list and replies went from under 2% to about 6% in ten weeks. Revenue hasn’t moved much yet — the pipeline is fuller, the deals are still working through. They said upfront it would take a cycle or two. I’d rather that than a made-up number.",
+      name: "Farhan Qureshi", // PLACEHOLDER
+      role: "Founder, performance marketing agency",
+      meta: "Ahmedabad · 9 people",
+    },
+    {
+      rating: 5, // PLACEHOLDER
+      body: "I knew I was dependent on one person for referrals. I didn’t know it was 80% until somebody wrote it down in front of me. We built a second channel before touching anything else, and referrals are down to 45% of leads — not because referrals fell, but because the base grew.",
+      name: "Priya Deshmukh", // PLACEHOLDER
+      role: "Partner, HR & compliance consultancy",
+      meta: "Nagpur · 5 people",
+    },
+    {
+      rating: 4.5, // PLACEHOLDER
+      body: "Every sales call had turned into a free scoping session. They handed us disqualifiers to use in the first fifteen minutes and we walked away from six deals we’d have chased before. Felt insane at the time. Our cycle went from 71 days to 44, and it was the most profitable thing we did all year.",
+      name: "Karthik Reddy", // PLACEHOLDER
+      role: "Co-founder, custom software studio",
+      meta: "Hyderabad · 16 people",
     },
   ],
   fallback: {

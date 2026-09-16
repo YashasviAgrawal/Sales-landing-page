@@ -3,19 +3,16 @@
 import { useRef } from "react";
 import {
   motion,
-  useMotionTemplate,
-  useMotionValue,
   useReducedMotion,
   useScroll,
-  useSpring,
   useTransform,
-  type MotionValue,
 } from "motion/react";
 import { ArrowDown } from "@phosphor-icons/react";
 import { brand, hero, links } from "@/lib/content";
 import { MagneticCta } from "@/components/ui/magnetic-cta";
 import { WordReveal } from "@/components/ui/word-reveal";
 import { AnimatedTooltip } from "@/components/ui/animated-tooltip";
+import { Particles } from "@/components/ui/particles";
 
 const EASE = [0.22, 0.61, 0.36, 1] as const;
 
@@ -29,8 +26,18 @@ const EASE = [0.22, 0.61, 0.36, 1] as const;
   nothing except a second place for the eye to start.
 
   So the first screen holds one thing: the claim, said once, in the middle of
-  the screen with light behind it. Everything here is either the sentence or
-  the light on the sentence; there is no third element to look at.
+  a black room. Everything here is either the sentence or the room; there is
+  no third element to look at.
+
+  The ground is jet black and stays jet black. It used to carry three green
+  washes - a pool behind the headline and two flanks drifting in from the
+  corners - and they are gone. On a page whose only accent is mint, a hero
+  filled with green light leaves the mint CTA sitting on a field of its own
+  colour with nothing to push against; on true black it is the brightest
+  thing on the screen, which is where the argument wants the eye. The drifting
+  particle field replaces them as the thing that keeps the screen alive, and
+  because it parallaxes against the pointer it also replaces the cursor light
+  that used to do that job. Two cursor effects was one too many.
 
   The premium reads out of restraint plus timing, not out of ornament:
 
@@ -38,10 +45,10 @@ const EASE = [0.22, 0.61, 0.36, 1] as const;
       components each animating on their own schedule
     - the accent phrase carries the turn and draws its own rule once the
       last word has landed
-    - the light is centred on the headline, breathes, and follows the
-      pointer, so the screen is never quite static and never moving enough
-      to compete with the type
-    - it all leaves together on scroll, slightly faster than the page
+    - the field drifts and leans toward the pointer, so the screen is never
+      quite static and never moving enough to compete with the type
+    - the copy leaves on scroll, slightly faster than the page, while the
+      field stays put - which is the only depth cue a flat black screen has
 
   Every motion below is off under prefers-reduced-motion. The layout is not.
 */
@@ -49,8 +56,7 @@ export function Hero() {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
 
-  /* The column lifts and dissolves as the page moves under it, which is the
-     only depth cue a single centred column can have. */
+  /* The column lifts and dissolves as the page moves under it. */
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
@@ -58,35 +64,32 @@ export function Hero() {
   const copyY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -96]);
   const fade = useTransform(scrollYProgress, [0, 0.72], [1, reduce ? 1 : 0]);
 
-  /*
-    A pool of light under the cursor. Percentages of the section rather than
-    pixels, so it survives a resize, and heavily sprung so it trails the
-    pointer instead of sticking to it - the difference between a light in a
-    room and a torch taped to your hand.
-  */
-  const px = useMotionValue(50);
-  const py = useMotionValue(34);
-  const pointerX = useSpring(px, { stiffness: 40, damping: 24, mass: 0.8 });
-  const pointerY = useSpring(py, { stiffness: 40, damping: 24, mass: 0.8 });
-
-  function trackPointer(e: React.PointerEvent) {
-    if (reduce || e.pointerType !== "mouse" || !ref.current) return;
-    const r = ref.current.getBoundingClientRect();
-    px.set(((e.clientX - r.left) / r.width) * 100);
-    py.set(((e.clientY - r.top) / r.height) * 100);
-  }
-
   return (
     <section
       ref={ref}
       id="top"
-      onPointerMove={trackPointer}
       /* pt clears the 68px header; pb clears the scroll cue. The 8px the
          bottom carries over the top is deliberate - optical centre sits a
          little above true centre. */
-      className="relative flex min-h-[100dvh] items-center overflow-hidden pt-24 pb-28"
+      className="relative flex min-h-[100dvh] items-center overflow-hidden bg-ink-950 pt-24 pb-28"
     >
-      <AmbientLight x={pointerX} y={pointerY} />
+      {/*
+        Dust, not stars. Paper white rather than mint: at 140 dots a mint
+        field would be the largest area of accent on the page and the one
+        button that matters would stop being the only green thing on it.
+        `size` and the alpha ceiling inside the component keep the largest
+        dot under 1.5px, so it reads as grain in the air.
+      */}
+      <Particles
+        className="absolute inset-0"
+        quantity={140}
+        staticity={40}
+        ease={60}
+        size={0.4}
+        color="#eaf2ed"
+      />
+
+      <AmbientLight />
 
       <motion.div
         style={{ y: copyY, opacity: fade }}
@@ -225,71 +228,24 @@ function SubWithTooltip() {
 }
 
 /*
-  Ambient light, rebuilt around the middle of the screen.
+  What is left of the ambient layer once the green went.
 
-  Four layers, in the order light actually stacks: the pool behind the
-  headline, the two flanks drifting in from off-screen, the pale sweep that
-  crosses every few seconds, then the fall-off that pulls the corners down so
-  the eye starts on the type. Grain last, over all of it - a wash this large
-  bands on cheap panels, and the reference ground is visibly grained.
+  Three things, in the order light actually stacks: the pale sweep that
+  crosses every few seconds, the fall-off that pulls the corners down so the
+  eye starts on the type, then grain over all of it.
+
+  It sits above the particle canvas deliberately. The vignette dims the dots
+  at the edges of the screen and leaves the field densest behind the
+  headline, which is the difference between a background and a backdrop.
 
   No image to download, and nothing here that moves fast enough to compete
   with a sentence.
 */
-function AmbientLight({
-  x,
-  y,
-}: {
-  x: MotionValue<number>;
-  y: MotionValue<number>;
-}) {
+function AmbientLight() {
   const reduce = useReducedMotion();
-
-  /* The cursor light. Kept faint on purpose: it should register as the room
-     being lit unevenly, not as an effect the reader can name. */
-  const pointerLight = useMotionTemplate`radial-gradient(460px 460px at ${x}% ${y}%, color-mix(in srgb, var(--color-signal) 8%, transparent), transparent 72%)`;
 
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-      {/* Behind the headline. Breathing, slowly enough to be felt rather
-          than watched. */}
-      <motion.div
-        className="wash-hero-core absolute inset-0"
-        animate={reduce ? undefined : { scale: [1, 1.07, 1], opacity: [0.9, 1, 0.9] }}
-        transition={{ duration: 13, repeat: Infinity, ease: "easeInOut" }}
-      />
-
-      {/*
-        The flanks drift, so they are oversized by more than they travel. At
-        `inset-0` a wash translated 60px to the right leaves 60px of unlit
-        section behind it, and a radial gradient that bright near its own
-        corner turns that into a visible hard seam across the top of the
-        screen. 128px of bleed on every side is comfortably past the 70px
-        either of them moves.
-      */}
-      <motion.div
-        className="wash-hero-near absolute -inset-32"
-        animate={
-          reduce ? undefined : { x: [0, 60, -30, 0], y: [0, 40, 10, 0] }
-        }
-        transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
-      />
-
-      <motion.div
-        className="wash-hero-far absolute -inset-32"
-        animate={
-          reduce ? undefined : { x: [0, -70, 20, 0], y: [0, 50, -20, 0] }
-        }
-        transition={{ duration: 34, repeat: Infinity, ease: "easeInOut" }}
-      />
-
-      {!reduce && (
-        <motion.div
-          className="absolute inset-0"
-          style={{ background: pointerLight }}
-        />
-      )}
-
       {/* A slow sweep of light across the whole first screen. */}
       <motion.div
         className="wash-sweep absolute inset-y-0 -left-1/3 w-1/3 skew-x-[-14deg]"

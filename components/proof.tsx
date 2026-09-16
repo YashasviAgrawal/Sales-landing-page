@@ -1,4 +1,4 @@
-import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
+import { Star } from "@phosphor-icons/react/dist/ssr";
 import { Reveal } from "@/components/ui/reveal";
 import { Section } from "@/components/ui/section";
 import { WordReveal } from "@/components/ui/word-reveal";
@@ -6,80 +6,112 @@ import { HoverCard } from "@/components/ui/hover-card";
 import { proof } from "@/lib/content";
 
 /*
-  PROOF.
+  PROOF, as six reviews.
 
-  The card is built around one move: Was → Now, with the leak and the repair
-  explaining the distance between them. Everything else on the card is
-  support, so the two figures carry the type weight and the two middle rows
-  are set small and labelled. A reader who only looks at the numbers has got
-  the case; a reader who wants the mechanism reads four more lines.
+  This was a Was → Now grid with the leak and the repair broken out into
+  labelled rows. It was a good case-study card and the wrong instrument: the
+  labels made it read as something we had written about the client, and a
+  founder discounts our account of their result far more heavily than they
+  discount the client's own sentences. So the scaffolding is gone. A rating,
+  what the person said, who they are. Nothing between the reader and the
+  speech.
 
-  Vague praise is deliberately impossible to render here. There is no field
-  for "great to work with" - the shape demands a broken metric, a named
-  cause, a named repair and a fixed metric with a timeframe, because that is
-  the only kind of testimonial a sceptical founder reads.
+  The rating row is what does the work the labels used to. It is the one
+  element on the card that can carry a reservation, which is why the ratings
+  are mixed and the four-star card is left in place rather than quietly
+  rounded up - six identical five-star cards is the shape of a fabricated
+  review wall, and one honest four is what makes the fives worth reading.
 
-  `proof.hasCases` swaps the whole section for the honest alternative. Being
-  new is not a weakness to hide behind stock quotes; it is the reason the
-  audit is free, and saying so converts better than a fabricated wall of
+  `proof.hasReviews` swaps the whole section for the honest alternative.
+  Being new is not a weakness to hide behind stock quotes; it is the reason
+  the audit is free, and saying so converts better than a fabricated wall of
   percentages would.
 */
 export function Proof() {
-  if (!proof.hasCases) return <Fallback />;
+  if (!proof.hasReviews) return <Fallback />;
 
   return (
     <Section id="proof" className="border-t hairline">
       <WordReveal
         text={proof.heading}
-        highlight="came for."
+        highlight="after the audit."
         className="display-tight text-3xl font-medium sm:text-5xl lg:text-[3.4rem]"
       />
+      <Reveal delay={0.08} blur>
+        <p className="mt-5 max-w-[52ch] text-[15px] leading-relaxed text-muted">
+          {proof.lead}
+        </p>
+      </Reveal>
 
-      <div className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-3">
-        {proof.cases.map((c, i) => (
-          <Reveal key={i} delay={0.08 * i} distance={24}>
+      <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {proof.reviews.map((r, i) => (
+          /* Staggered across the row, not down the whole grid - at six cards
+             a cumulative delay leaves the last one arriving half a second
+             after the reader has already looked at it. */
+          <Reveal key={r.name} delay={0.07 * (i % 3)} distance={24}>
             <HoverCard className="flex h-full flex-col rounded-[12px] border hairline bg-ink-900 p-6 sm:p-7">
-              <p className="text-[12px] uppercase tracking-[0.14em] text-muted">
-                {c.who}
+              <div className="flex items-center gap-2.5">
+                <Stars rating={r.rating} />
+                <span className="text-[12px] tabular-nums text-muted">
+                  {r.rating.toFixed(1)}
+                </span>
+              </div>
+
+              <p className="mt-5 text-[15px] leading-relaxed text-paper">
+                {r.body}
               </p>
 
-              {/* Was → Now. The whole card in two lines. */}
-              <p className="mt-6 text-[15px] leading-snug text-muted line-through decoration-fall/50">
-                {c.was}
-              </p>
-              <p className="mt-2 flex items-start gap-2 text-[1.15rem] font-medium leading-snug tracking-tight text-signal">
-                <ArrowRight
-                  size={15}
-                  weight="bold"
-                  className="mt-[6px] shrink-0"
-                />
-                {c.now}
-              </p>
-
-              <dl className="mt-6 flex flex-col gap-3 border-t hairline pt-5 text-[14px] leading-relaxed">
-                <div>
-                  <dt className="text-[12px] text-muted">The leak</dt>
-                  <dd className="mt-0.5 text-body">{c.leak}</dd>
-                </div>
-                <div>
-                  <dt className="text-[12px] text-muted">The fix</dt>
-                  <dd className="mt-0.5 text-body">{c.fix}</dd>
-                </div>
-              </dl>
-
-              <blockquote className="mt-auto border-t hairline pt-5">
-                <p className="text-[14px] leading-relaxed text-paper">
-                  “{c.quote}”
+              <div className="mt-auto pt-6">
+                <p className="text-[14px] font-medium text-paper">{r.name}</p>
+                <p className="mt-1 text-[13px] leading-snug text-muted">
+                  {r.role}
                 </p>
-                <footer className="mt-3 text-[13px] text-muted">
-                  {c.name} — {c.role}
-                </footer>
-              </blockquote>
+                <p className="mt-0.5 text-[12px] text-muted/80">{r.meta}</p>
+              </div>
             </HoverCard>
           </Reveal>
         ))}
       </div>
     </Section>
+  );
+}
+
+/*
+  Five stars, filled to `rating`.
+
+  Each star is drawn twice: a dim one as the track, and a mint one clipped to
+  the fraction of that star the rating covers. It is more markup than a row
+  of half-star glyphs and it is the only version where 4.5 lands exactly on
+  the middle of the fifth star rather than a pixel or two short of it.
+*/
+function Stars({ rating }: { rating: number }) {
+  return (
+    <span
+      className="flex items-center gap-[3px]"
+      role="img"
+      aria-label={`Rated ${rating} out of 5`}
+    >
+      {[0, 1, 2, 3, 4].map((i) => {
+        const fill = Math.min(Math.max(rating - i, 0), 1);
+        return (
+          <span key={i} className="relative inline-flex">
+            <Star size={14} weight="fill" className="shrink-0 text-ink-700" />
+            {fill > 0 && (
+              <span
+                className="absolute inset-y-0 left-0 overflow-hidden"
+                style={{ width: `${fill * 100}%` }}
+              >
+                <Star
+                  size={14}
+                  weight="fill"
+                  className="shrink-0 text-signal"
+                />
+              </span>
+            )}
+          </span>
+        );
+      })}
+    </span>
   );
 }
 

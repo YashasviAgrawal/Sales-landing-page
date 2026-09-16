@@ -330,55 +330,26 @@
     only; the paint is all here.
   */
   /*
-    Tightened when the ground went black. The same wash over #060d0a read as
-    atmosphere; over #000 it reads as fog, because there is nothing under it
-    any more. Smaller radii and lower mixes turn them back into what they are
-    meant to be - light spilling in from off-screen, not a green field.
+    THE HERO GROUND IS JET BLACK.
+
+    Three washes used to live here - `wash-hero-core` behind the headline and
+    `wash-hero-near` / `wash-hero-far` drifting in from the top corners - and
+    all three are deleted rather than left unused, because dead paint with a
+    long comment attached is how the next person ends up reinstating it.
+
+    The reasoning, so it is not rediscovered the hard way: the palette above
+    moved the green out of the surfaces and into the light precisely so the
+    mint accent had black to push against. Filling the first screen with
+    green light undid that for the one viewport where it matters most. The
+    hero now carries a particle canvas instead, and the only light on it is
+    the sweep and the fall-off below.
   */
-  .wash-hero-near {
-    background: radial-gradient(
-      760px 440px at 10% -10%,
-      color-mix(in srgb, var(--color-aura) 40%, transparent),
-      color-mix(in srgb, var(--color-signal) 5%, transparent) 30%,
-      transparent 56%
-    );
-  }
-  .wash-hero-far {
-    background: radial-gradient(
-      580px 400px at 90% 16%,
-      color-mix(in srgb, var(--color-aura) 22%, transparent),
-      transparent 54%
-    );
-  }
 
   /*
-    THE CENTRED HERO.
-
-    The two washes above are flanks - they come in from off-screen at the top
-    corners, which is right for a hero whose copy sits in the left column.
-    With the copy in the middle of the screen the middle of the screen has to
-    be the lit part, or the headline reads as sitting in the one unlit band
-    between two glows.
-
-    `wash-hero-core` is that light: one soft pool behind the headline, sized
-    to the measure of the type rather than to the viewport, so it lifts the
-    display line and falls off before it reaches the trust strip. It breathes
-    in the component; the paint is here.
-  */
-  .wash-hero-core {
-    background: radial-gradient(
-      900px 580px at 50% 34%,
-      color-mix(in srgb, var(--color-aura) 42%, transparent),
-      color-mix(in srgb, var(--color-signal) 8%, transparent) 32%,
-      transparent 64%
-    );
-  }
-
-  /*
-    Edge fall-off. Centred copy needs the corners pulled down, otherwise the
-    two flank washes are the brightest thing on screen and the eye starts at
-    a corner instead of at the headline. Transparent across the middle 46%,
-    so nothing is laid over the type or the button.
+    Edge fall-off. Centred copy needs the corners pulled down, and on a black
+    ground it does a second job: it dims the particle field at the edges of
+    the screen so the dots are densest behind the headline. Transparent
+    across the middle 46%, so nothing is laid over the type or the button.
   */
   .hero-vignette {
     background: radial-gradient(
