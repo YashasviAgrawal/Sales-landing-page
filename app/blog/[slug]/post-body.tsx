@@ -60,7 +60,7 @@ export function PostBody({ html, toc }: { html: string; toc: TocEntry[] }) {
                 >
                   <a
                     href={`#${entry.id}`}
-                    className="block leading-snug text-body transition-colors duration-200 hover:text-signal"
+                    className="block leading-snug text-body transition-colors duration-200 hover:text-paper"
                   >
                     {entry.text}
                   </a>

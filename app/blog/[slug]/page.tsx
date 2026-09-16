@@ -231,7 +231,7 @@ export default async function PostPage({ params }: Props) {
             <nav aria-label="Breadcrumb" className="mb-8">
               <ol className="flex flex-wrap items-center gap-2 text-[13px] text-muted">
                 <li>
-                  <Link href="/" className="transition-colors hover:text-signal">
+                  <Link href="/" className="transition-colors hover:text-paper">
                     {brand.name}
                   </Link>
                 </li>
@@ -239,7 +239,7 @@ export default async function PostPage({ params }: Props) {
                 <li>
                   <Link
                     href="/blog"
-                    className="transition-colors hover:text-signal"
+                    className="transition-colors hover:text-paper"
                   >
                     Blog
                   </Link>
@@ -254,7 +254,7 @@ export default async function PostPage({ params }: Props) {
                     <Link
                       key={tag}
                       href={`/blog?tag=${encodeURIComponent(tag)}`}
-                      className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[12px] text-body transition-colors hover:border-signal/50 hover:text-signal"
+                      className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[12px] text-body transition-colors hover:border-white/30 hover:text-paper"
                     >
                       {tag}
                     </Link>
@@ -338,9 +338,9 @@ export default async function PostPage({ params }: Props) {
                   <Link
                     key={item.id}
                     href={`/blog/${item.slug}`}
-                    className="group rounded-[12px] border hairline bg-ink-900 p-5 transition-colors duration-300 hover:border-signal/40"
+                    className="group rounded-[12px] border hairline bg-ink-900 p-5 transition-colors duration-300 hover:border-white/25"
                   >
-                    <h3 className="text-[15px] font-medium leading-snug text-paper transition-colors group-hover:text-signal">
+                    <h3 className="text-[15px] font-medium leading-snug text-paper transition-colors group-hover:text-paper">
                       {item.title}
                     </h3>
                     {item.excerpt ? (
