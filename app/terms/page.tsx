@@ -1,12 +1,21 @@
 import type { Metadata } from "next";
 import { LegalPage } from "@/components/legal-page";
-import { brand, legal } from "@/lib/content";
+import { legal } from "@/lib/content";
+import { absoluteUrl } from "@/lib/site-url";
 
+/* Title is the page name only; the layout template appends the brand. */
 export const metadata: Metadata = {
-  title: `${legal.terms.title} - ${brand.name}`,
+  title: legal.terms.title,
   description:
     "What we sell, what we do not promise, how fees and cancellation work, and who owns what.",
-  robots: { index: true, follow: true },
+  alternates: { canonical: absoluteUrl("/terms") },
+  openGraph: {
+    type: "article",
+    title: legal.terms.title,
+    description:
+      "What we sell, what we do not promise, how fees and cancellation work, and who owns what.",
+    url: absoluteUrl("/terms"),
+  },
 };
 
 export default function TermsPage() {

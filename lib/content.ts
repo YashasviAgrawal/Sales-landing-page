@@ -17,7 +17,14 @@
 
 export const brand = {
   name: "Sales Brain",
-  domain: "salesbrain.io", // PLACEHOLDER
+  /*
+    The live domain. Everything absolute on this site is built from it -
+    canonical tags, the sitemap, RSS links, OpenGraph URLs - so it has to be
+    the address the site is actually served from and nothing else. See
+    lib/site-url.ts, which prefers NEXT_PUBLIC_SITE_URL over this and falls
+    back here.
+  */
+  domain: "salesbrain.in",
   /*
     Where every CTA on the page points.
     "#book" scrolls to the on-page booking form, which always works.
@@ -28,7 +35,7 @@ export const brand = {
   bookingUrl: "/#book",
   /* The on-page symptom checker. Not a separate route. */
   quizUrl: "/#diagnose",
-  email: "hello@salesbrain.io", // PLACEHOLDER
+  email: "contact@salesbrain.in",
   founder: "Aarav Menon", // PLACEHOLDER
   city: "Jaipur, India",
   tagline: "We diagnose before we prescribe.",
@@ -47,6 +54,17 @@ export const nav = [
   { label: "The Problem", href: "/#problem" },
   { label: "How It Works", href: "/#how" },
   { label: "Results", href: "/#proof" },
+  /*
+    The fourth link, added when the blog was. The note above argues against a
+    fourth on the grounds that it dilutes a nav whose job is holding the CTA
+    in view, and that still holds for another section anchor - but this one is
+    different in kind. It is the only item that leaves the landing page, and
+    it is the only page on the site that search traffic can arrive on
+    directly. A blog that nothing links to is a blog no crawler re-visits and
+    no reader finds, and the site-wide nav is the strongest internal link
+    there is to give it.
+  */
+  { label: "Blog", href: "/blog" },
 ];
 
 /*
@@ -580,7 +598,16 @@ export const book = {
      not actually enforce is the one lie on this page a buyer can catch. */
   scarcity: "Limited to six audits a month. No pitch, no obligation.",
   ps: "Every month you don’t fix the broken link, it costs you the same amount it cost you last month. That number is the real price of waiting.",
-  note: "Sending this opens your email client with the answers filled in, so nothing is stored on this site.",
+  /*
+    This line used to say nothing was stored on the site, which was true when
+    the form only opened a mailto. It now writes to a database, so the promise
+    had to change rather than quietly become false - the one claim on this page
+    a reader could catch us on is the one about their own data.
+
+    What replaces it says the two things a person hesitating over the button
+    actually wants to know: when they will hear back, and who else sees it.
+  */
+  note: "We read every one and reply within one business day. Your details stay with us - no list, no sharing.",
   fields: {
     name: "Name",
     email: "Email",
@@ -590,7 +617,16 @@ export const book = {
   },
   submit: "Book My Free Sales Audit",
   invalid: "Add your name and a valid email first.",
-  sent: "Your email client should be open. If it did not open, write to us directly at",
+  sending: "Sending…",
+  sent: "Got it. We’ll read it today and reply within one business day.",
+  /*
+    The failure line. It does not apologise and it does not say "error" - it
+    gives the reader the next action, because a person who has just written
+    four fields about their revenue problem wants those words to arrive
+    somewhere, not a status code. The form opens their email client with the
+    same answers already filled in, so the enquiry survives our outage.
+  */
+  failed: "That didn’t save - we’ve opened your email client with the same answers instead. Or write to us directly at",
 };
 
 export const legal = {
@@ -644,9 +680,24 @@ export const legal = {
         h: "The short version",
         p: "This site has no analytics, no advertising pixels and no third-party trackers. The symptom checker runs entirely in your browser and your selections are never sent anywhere.",
       },
+      /*
+        This section used to end "and is never stored on this website", which
+        was true while the booking form only opened a mailto. It writes to a
+        database now, and a privacy policy that describes the version of the
+        site we used to run is the single worst thing on a page whose whole
+        argument is that we tell people the truth about what we find.
+
+        What replaces it names the processor, says where the data physically
+        sits, and admits to the one thing people never think to ask about -
+        that the server keeps a fingerprint of their IP address.
+      */
       {
         h: "What we collect",
-        p: "Only what you type into the booking form or the newsletter field, and only when you submit it. The booking form opens your own email client, which means the message travels to us as an ordinary email and is never stored on this website.",
+        p: "Only what you type into the booking form or the newsletter field, and only when you submit it: your name, your email address, your website if you give one, and the line you write about what is holding your revenue back.",
+      },
+      {
+        h: "Where it is stored",
+        p: "Booking form submissions are saved to our own database, hosted by Supabase, and are readable only by us through a password-protected admin page. We also store a one-way fingerprint of the internet address you submitted from, so we can spot automated abuse. It cannot be turned back into your address, and we never see the address itself.",
       },
       {
         h: "Why we hold it",
@@ -654,7 +705,7 @@ export const legal = {
       },
       {
         h: "How long we keep it",
-        p: "Enquiry emails are kept for two years. Client engagement material is kept for seven years, because tax law requires it. Newsletter addresses are kept until you unsubscribe, which every issue links to.",
+        p: "Booking form entries and enquiry emails are kept for two years, then deleted. Client engagement material is kept for seven years, because tax law requires it. Newsletter addresses are kept until you unsubscribe, which every issue links to.",
       },
       {
         h: "Client data during an engagement",

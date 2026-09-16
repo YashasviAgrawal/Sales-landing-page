@@ -1,9 +1,35 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { brand } from "@/lib/content";
 import { WordReveal } from "@/components/ui/word-reveal";
 import { Reveal } from "@/components/ui/reveal";
 import { MagneticCta } from "@/components/ui/magnetic-cta";
+
+/*
+  A 404 must never be indexable.
+
+  Next already answers this route with a real 404 status, which is the part
+  that matters most - but the page inherits the root layout's `index: true`,
+  and a soft-404 that says it may be indexed is how "This one really is
+  broken." ends up in someone's search results under the brand name.
+
+  `follow: true` is deliberate: do not index this page, but do follow the
+  links on it back to the pages that should be indexed.
+*/
+export const metadata: Metadata = {
+  title: "Page not found",
+  robots: { index: false, follow: true },
+  /*
+    No canonical at all, which is why this is explicitly null rather than
+    omitted - without it the page inherits the layout's `canonical: "/"` and
+    every 404 on the site declares itself a duplicate of the home page. That
+    is the textbook soft-404 signal: it invites Google to treat a genuinely
+    missing URL as a real page, and to keep re-crawling addresses that will
+    never exist.
+  */
+  alternates: { canonical: null },
+};
 
 /*
   A real 404, so a mistyped or stale URL lands somewhere branded with a way

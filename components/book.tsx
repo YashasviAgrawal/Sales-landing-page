@@ -7,7 +7,7 @@ import { WordReveal } from "@/components/ui/word-reveal";
 import { Reveal } from "@/components/ui/reveal";
 import { CreepyButton } from "@/components/ui/creepy-button";
 
-type Status = "idle" | "invalid" | "sent";
+type Status = "idle" | "invalid" | "sending" | "sent" | "failed";
 
 /*
   The closing section, and the destination for every CTA on the page.
@@ -23,8 +23,12 @@ type Status = "idle" | "invalid" | "sent";
   itself - the page argues that finding a leak takes paying attention, and
   the thing you actually press to book watches you back.
 
-  The form hands the enquiry to an ordinary email rather than pretending to
-  have a backend, so nothing here can break.
+  The form used to hand the enquiry to a mailto rather than pretend to have a
+  backend. It has one now: POST /api/leads writes the row to Supabase and the
+  admin panel at /admin reads it. The mailto did not go away, though - it is
+  the fallback for when the API cannot take the write, because the worst
+  outcome for a form at the bottom of a page someone just read is that their
+  answers evaporate. See the `failed` branch below.
 */
 export function Book() {
   const reduce = useReducedMotion();
@@ -34,20 +38,23 @@ export function Book() {
     email: "",
     website: "",
     context: "",
+    /*
+      The honeypot. Hidden from people and from screen readers, so only a bot
+      filling in every field it finds will put anything here. The server sees
+      a non-empty value, answers 200, and writes nothing.
+    */
+    company: "",
   });
 
   function set(key: keyof typeof form, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
-    if (status !== "idle") setStatus("idle");
+    /* Clear a validation or failure message as soon as they start fixing it,
+       but never interrupt a send in flight. */
+    if (status === "invalid" || status === "failed") setStatus("idle");
   }
 
-  function submit() {
-    const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email);
-    if (!form.name.trim() || !validEmail) {
-      setStatus("invalid");
-      return;
-    }
-
+  /* The enquiry as an email, used only when the write fails. */
+  function mailtoHref() {
     const body = [
       `Name: ${form.name}`,
       `Email: ${form.email}`,
@@ -59,13 +66,51 @@ export function Book() {
       .filter(Boolean)
       .join("\n");
 
-    const href =
+    return (
       `mailto:${brand.email}` +
       `?subject=${encodeURIComponent(`Sales audit request - ${form.name}`)}` +
-      `&body=${encodeURIComponent(body)}`;
+      `&body=${encodeURIComponent(body)}`
+    );
+  }
 
-    window.location.href = href;
-    setStatus("sent");
+  async function submit() {
+    if (status === "sending") return;
+
+    /*
+      The same expression the server validates with, deliberately. Two
+      validators that disagree produce the worst possible bug: a form that
+      accepts a value and an API that rejects it, with the reader in the
+      middle being told to fix something that looks fine.
+    */
+    const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email);
+    if (!form.name.trim() || !validEmail) {
+      setStatus("invalid");
+      return;
+    }
+
+    setStatus("sending");
+
+    try {
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      setStatus("sent");
+      setForm({ name: "", email: "", website: "", context: "", company: "" });
+    } catch {
+      /*
+        The write failed - the keys are missing, the database is down, or
+        they are offline. Rather than lose four fields of considered writing,
+        open their email client with the same answers filled in. They still
+        reach us; we just find out by inbox instead of by panel.
+      */
+      setStatus("failed");
+      window.location.href = mailtoHref();
+    }
   }
 
   const field =
@@ -194,19 +239,78 @@ export function Book() {
                   placeholder="Good calls, then silence. Two of the last six proposals closed and I can’t say why."
                 />
               </label>
+
+              {/*
+                The honeypot, and the three separate things it takes to hide
+                one properly. `hidden` alone would do it, but a bot that
+                respects `hidden` is not the kind that needs catching:
+
+                  aria-hidden + tabIndex   keeps it off the screen reader and
+                                           out of the tab order, so nobody
+                                           using a keyboard or a screen reader
+                                           ever lands in a field they cannot
+                                           see and fails their own submission
+                  autoComplete="off"       stops the browser helpfully filling
+                                           it with a saved company name, which
+                                           would silently discard a real lead
+                  the wrapper, not input   position/opacity on a container is
+                                           harder to spot than display:none on
+                                           the field itself
+
+                It is named "company" because that is a field name a form
+                filler expects to find and will populate. A field called
+                "leave-this-blank" teaches the bot exactly what to skip.
+              */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute left-[-9999px] h-0 w-0 overflow-hidden opacity-0"
+              >
+                <label>
+                  Company
+                  <input
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={form.company}
+                    onChange={(e) => set("company", e.target.value)}
+                  />
+                </label>
+              </div>
             </div>
 
             <div className="mt-6 flex flex-wrap items-center gap-5">
-              <CreepyButton onClick={submit} className="text-[15px]">
-                {book.submit}
+              <CreepyButton
+                onClick={submit}
+                disabled={status === "sending"}
+                className={`text-[15px] ${status === "sending" ? "pointer-events-none opacity-70" : ""}`}
+              >
+                {status === "sending" ? book.sending : book.submit}
               </CreepyButton>
 
-              <p className="max-w-[32ch] text-[13px] leading-relaxed text-muted">
+              {/*
+                One line, five states, same slot. The message replaces the
+                privacy note rather than appearing beneath it, so the block
+                never changes height and the button never moves under the
+                cursor at the moment it is pressed.
+
+                aria-live="polite" is what makes the result reach a screen
+                reader at all: the text swaps in without any focus change, so
+                without it the only feedback on a successful submission is
+                visual.
+              */}
+              <p
+                aria-live="polite"
+                className="max-w-[32ch] text-[13px] leading-relaxed text-muted"
+              >
                 {status === "invalid" ? (
                   <span className="text-signal">{book.invalid}</span>
+                ) : status === "sending" ? (
+                  <span className="text-body">{book.sending}</span>
                 ) : status === "sent" ? (
+                  <span className="text-signal">{book.sent}</span>
+                ) : status === "failed" ? (
                   <span className="text-body">
-                    {book.sent}{" "}
+                    {book.failed}{" "}
                     <a
                       href={`mailto:${brand.email}`}
                       className="text-signal underline"

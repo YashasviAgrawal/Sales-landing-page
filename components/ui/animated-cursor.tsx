@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { motion, useMotionValue, useSpring, useReducedMotion } from "motion/react";
 
 /*
@@ -31,6 +32,18 @@ const INTERACTIVE = 'a, button, [role="button"], input, textarea, select, label,
 
 export function AnimatedCursor() {
   const reduce = useReducedMotion();
+  const pathname = usePathname();
+  /*
+    Off inside the admin panel.
+
+    It lives in the root layout so the pointer is consistent across the
+    marketing pages, and /admin is not one of those - it is a tool, used for
+    long stretches, full of small targets: a select in a table row, a text
+    caret in a notes field. A ring that lags a few frames behind the pointer
+    is a flourish on a landing page and friction on a spreadsheet, and the
+    lagging ring lands worst exactly where precision matters most.
+  */
+  const onAdmin = pathname?.startsWith("/admin") ?? false;
   const [enabled, setEnabled] = useState(false);
   const [state, setState] = useState<CursorState>("idle");
   const [pressed, setPressed] = useState(false);
@@ -48,13 +61,19 @@ export function AnimatedCursor() {
   /* A fine pointer is the real gate - `hover` alone is true for some stylus
      and hybrid setups where a drawn cursor makes no sense. */
   useEffect(() => {
-    if (reduce) return;
+    /* setEnabled(false) rather than a bare return, so navigating from the
+       landing page into /admin turns the drawn pointer off and hands the
+       native one back, instead of leaving the last value in place. */
+    if (reduce || onAdmin) {
+      setEnabled(false);
+      return;
+    }
     const mq = window.matchMedia("(pointer: fine)");
     const apply = () => setEnabled(mq.matches);
     apply();
     mq.addEventListener("change", apply);
     return () => mq.removeEventListener("change", apply);
-  }, [reduce]);
+  }, [reduce, onAdmin]);
 
   useEffect(() => {
     if (!enabled) return;
