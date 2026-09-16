@@ -16,7 +16,7 @@ export function Section({
       id={id}
       className={`section-y scroll-mt-24 ${className}`}
     >
-      <div className={bleed ? "" : "mx-auto w-full max-w-[1240px] px-5 md:px-8"}>
+      <div className={bleed ? "" : "mx-auto w-full max-w-[1240px] gutter-x"}>
         {children}
       </div>
     </section>

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState, useId } from "react";
+import { useState, useId, useRef, useEffect } from "react";
 import { AnimatePresence, motion, type Variants } from "motion/react";
 import { cn } from "@/lib/utils";
 
@@ -258,22 +258,72 @@ export function AnimatedTooltip({
   const [open, setOpen] = useState(false);
   const cfg = VARIANTS[variant] ?? VARIANTS.cora;
   const id = useId().replace(/:/g, "");
+  const wrapRef = useRef<HTMLSpanElement>(null);
+
+  /*
+    A touchscreen has no hover, so mouse events alone made this content
+    unreachable on a phone - and on the hero that content is the list of the
+    seven links, which is the whole claim the page is built on.
+
+    The two input models are kept apart by pointerType rather than by a
+    breakpoint, because the question is what the reader is actually using,
+    not how wide their screen is: a touch laptop gets both, correctly.
+    Without the guard the models fight - on a tap, `pointerenter` fires
+    first and opens the tooltip, then the tap handler closes it again.
+  */
+  const hover = (next: boolean) => (e: React.PointerEvent) => {
+    if (e.pointerType === "mouse") setOpen(next);
+  };
+
+  const tap = (e: React.PointerEvent) => {
+    if (e.pointerType !== "mouse") setOpen((v) => !v);
+  };
+
+  /* A tooltip opened by tap has no pointer-leave to close it, so it needs
+     its own dismissal: anywhere else on the page, or Escape. */
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: PointerEvent) => {
+      if (!wrapRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
 
   return (
     <span
+      ref={wrapRef}
       className={cn("relative inline-block", className)}
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
+      onPointerEnter={hover(true)}
+      onPointerLeave={hover(false)}
       onFocus={() => setOpen(true)}
       onBlur={() => setOpen(false)}
     >
       <motion.span
         role="button"
         tabIndex={0}
+        aria-expanded={open}
         aria-describedby={open ? id : undefined}
+        onPointerUp={tap}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setOpen((v) => !v);
+          }
+        }}
         /* Negative margin matches the padding, so the larger hover target
-           does not push the surrounding text apart. */
-        className="-mx-1 inline-block cursor-pointer select-none px-1 font-medium"
+           does not push the surrounding text apart. The underline is what
+           tells a touch reader there is anything here to press - on a
+           pointer device the colour change on hover said it, and on a phone
+           nothing did. */
+        className="-mx-1 inline-block cursor-pointer select-none px-1 font-medium underline decoration-dotted decoration-from-font underline-offset-4"
         animate={{ color: open ? accentColor : restColor }}
         transition={{ duration: 0.3, ease: "easeOut" }}
       >

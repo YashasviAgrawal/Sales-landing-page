@@ -92,11 +92,45 @@
     }
   }
 
+  /*
+    Nothing on this page is meant to scroll sideways, but the reveal
+    animations translate on the x axis before they play: a `RevealItem` with
+    direction="left" sits 22px off its resting position until it enters the
+    viewport, and where the element already reaches the content edge - the
+    numbered list in the Call section is the one that did it - those 22px
+    push 2px past a 320-390px viewport. The page then rubber-bands sideways
+    on iOS for no visible reason, because the thing causing it is invisible
+    until you scroll to it.
+
+    `clip` rather than `hidden` on purpose. `overflow-x: hidden` forces the
+    other axis to `auto`, which turns the root into a scroll container and
+    breaks `position: sticky` - and the Call section's photograph is sticky
+    on large screens. `clip` creates no scroll container, so sticky, smooth
+    scrolling and the scroll-spy all keep working.
+  */
+  html {
+    overflow-x: clip;
+  }
+
   body {
     background-color: var(--color-ink-950);
     color: var(--color-paper);
     -webkit-font-smoothing: antialiased;
     font-feature-settings: "ss01", "cv01";
+  }
+
+  /*
+    The grey flash iOS paints over a tapped link is the wrong colour on a
+    black page and lands on whole rows, not just buttons. Removed in favour
+    of the components' own active states. `touch-action: manipulation` drops
+    the 300ms double-tap-to-zoom delay, so taps register immediately.
+  */
+  a,
+  button,
+  [role="button"],
+  summary {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
 
   ::selection {
@@ -127,6 +161,31 @@
   }
 }
 
+/*
+  iOS Safari zooms the whole page in when a focused form control has a
+  font-size under 16px, and does not zoom back out on blur. Every field on
+  this site was 15px, so tapping the booking form or the newsletter box left
+  the reader at roughly 1.2x with the layout shoved off-screen and no way
+  back except a manual pinch.
+
+  16px is the threshold, not a preference. It is one pixel off the design
+  value, and only below md, so nothing about the desktop typography changes.
+
+  UNLAYERED ON PURPOSE - do not move this inside `@layer base`. The fields
+  set their size with a Tailwind utility (`text-[15px]`), and utilities are a
+  later layer than base, so a base rule loses to them no matter how specific
+  it is; that is exactly what happened on the first attempt at this fix.
+  Declarations outside any layer beat every layered one, which is what makes
+  this hold without an `!important`.
+*/
+@media (max-width: 767px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
 @layer utilities {
   .hairline {
     border-color: rgb(255 255 255 / 0.09);
@@ -154,14 +213,49 @@
     Anything that needs to break this rule should say why in a comment
     rather than quietly hand-rolling another `py-*`.
   */
+  /*
+    Section rhythm. Deliberately asymmetric - more above than below - so a
+    heading reads as belonging to the block under it rather than floating
+    between two equal gaps.
+
+    Opened up from 4rem/3.25rem. At the old values the sections butted into
+    each other and the page read as one continuous wall of content; the
+    argument is dense enough that the space between its parts is doing real
+    work, and this is the cheapest way to buy it.
+  */
   .section-y {
-    padding-top: 2.5rem;
-    padding-bottom: 2.25rem;
+    padding-top: 3.5rem;
+    padding-bottom: 3rem;
   }
   @media (min-width: 768px) {
     .section-y {
-      padding-top: 4rem;
-      padding-bottom: 3.25rem;
+      padding-top: 6rem;
+      padding-bottom: 5rem;
+    }
+  }
+
+  /*
+    THE HORIZONTAL GUTTER. One token, every section - the same argument as
+    .section-y above, and it replaces the `px-5 md:px-8` that was repeated in
+    twelve places.
+
+    The values are the ones it replaces: 20px, 32px from md up. What it adds
+    is the safe-area floor. A notched phone held in landscape puts the cutout
+    over one of the long edges and reports it as env(safe-area-inset-left/
+    right) - around 44px, more than double the gutter - so a fixed header or
+    a line of body text with a flat 20px padding runs underneath it. `max()`
+    keeps the designed gutter everywhere it is enough and only grows it on
+    the edge the OS says is obstructed. The insets are 0 on every device
+    without a cutout, so this is a no-op on the vast majority of screens.
+  */
+  .gutter-x {
+    padding-left: max(1.25rem, env(safe-area-inset-left));
+    padding-right: max(1.25rem, env(safe-area-inset-right));
+  }
+  @media (min-width: 768px) {
+    .gutter-x {
+      padding-left: max(2rem, env(safe-area-inset-left));
+      padding-right: max(2rem, env(safe-area-inset-right));
     }
   }
 
@@ -236,25 +330,81 @@
     only; the paint is all here.
   */
   /*
-    Tightened when the ground went black. The same wash over #060d0a read as
-    atmosphere; over #000 it reads as fog, because there is nothing under it
-    any more. Smaller radii and lower mixes turn them back into what they are
-    meant to be - light spilling in from off-screen, not a green field.
+    THE HERO GROUND IS JET BLACK.
+
+    Three washes used to live here - `wash-hero-core` behind the headline and
+    `wash-hero-near` / `wash-hero-far` drifting in from the top corners - and
+    all three are deleted rather than left unused, because dead paint with a
+    long comment attached is how the next person ends up reinstating it.
+
+    The reasoning, so it is not rediscovered the hard way: the palette above
+    moved the green out of the surfaces and into the light precisely so the
+    mint accent had black to push against. Filling the first screen with
+    green light undid that for the one viewport where it matters most. The
+    hero now carries a particle canvas instead, and the only light on it is
+    the sweep and the fall-off below.
   */
-  .wash-hero-near {
+
+  /*
+    Edge fall-off. Centred copy needs the corners pulled down, and on a black
+    ground it does a second job: it dims the particle field at the edges of
+    the screen so the dots are densest behind the headline. Transparent
+    across the middle 46%, so nothing is laid over the type or the button.
+  */
+  .hero-vignette {
     background: radial-gradient(
-      760px 440px at 10% -10%,
-      color-mix(in srgb, var(--color-aura) 40%, transparent),
-      color-mix(in srgb, var(--color-signal) 5%, transparent) 30%,
-      transparent 56%
+      124% 96% at 50% 46%,
+      transparent 46%,
+      color-mix(in srgb, var(--color-ink-950) 55%, transparent) 80%,
+      var(--color-ink-950) 100%
     );
   }
-  .wash-hero-far {
-    background: radial-gradient(
-      580px 400px at 90% 16%,
-      color-mix(in srgb, var(--color-aura) 22%, transparent),
-      transparent 54%
+
+  /*
+    The accent words in the hero headline. Mint, italic, and lit from behind
+    - a text-shadow at this radius is not legible as a shadow, only as the
+    words being the brightest thing in the composition, which is exactly the
+    job of the phrase that carries the turn.
+
+    The rule underneath draws itself once, after the last word has landed
+    (the reveal finishes at ~1.4s). It is applied per word by WordReveal, so
+    the gap between the words stays open and it reads as an underline rather
+    than a bar. Cancelled outright under reduced motion, where an animation
+    delay would otherwise still make it appear late and unexplained.
+  */
+  .hl-accent {
+    position: relative;
+    font-style: italic;
+    color: var(--color-signal);
+    text-shadow: 0 0 48px color-mix(in srgb, var(--color-signal) 38%, transparent);
+  }
+  .hl-accent::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: -0.04em;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-signal) 20%, transparent),
+      var(--color-signal),
+      color-mix(in srgb, var(--color-signal) 20%, transparent)
     );
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: hl-draw 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) 1.45s forwards;
+  }
+  @keyframes hl-draw {
+    to {
+      transform: scaleX(1);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hl-accent::after {
+      animation: none;
+      transform: scaleX(1);
+    }
   }
   .wash-book {
     background: radial-gradient(
@@ -346,6 +496,34 @@
     );
   }
 
+  /*
+    Grows a small control's touch target without moving anything on screen.
+
+    The footer's links are 19-21px tall, because that is how tall a line of
+    15px type is. That reads fine and taps badly, and it is under the 24px
+    WCAG 2.5.8 asks for. Padding would fix the target and move the layout -
+    and on anything carrying .link-underline it would also drag the hover
+    underline away from the text, since that rule hangs 5px off the bottom of
+    the box.
+
+    An absolutely positioned ::before takes no part in layout, so the target
+    grows and nothing shifts. The band is centred on the control and its
+    height is `--tap`, which has to be set per case: a vertical list needs a
+    band no taller than the distance between its rows, or neighbouring bands
+    overlap and the lower link quietly swallows taps meant for the one above.
+  */
+  .tap-area {
+    position: relative;
+  }
+  .tap-area::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: 50%;
+    translate: 0 -50%;
+    block-size: var(--tap, 44px);
+  }
+
   /* Nav link underline that draws in from the left on hover. */
   .link-underline {
     position: relative;
@@ -365,5 +543,257 @@
   .link-underline:hover::after,
   .link-underline:focus-visible::after {
     transform: scaleX(1);
+  }
+}
+
+/* ==========================================================================
+   ARTICLE PROSE
+   ==========================================================================
+
+   Typography for rendered blog markdown. Scoped to .prose-post so it can
+   never reach the landing page, whose every element is styled by hand.
+
+   Written as element selectors rather than utility classes because the HTML
+   is generated by the markdown renderer at request time - there is nowhere to
+   put a className on a paragraph that does not exist until someone writes it.
+
+   The measure is the decision everything else follows from. Body text is
+   capped near 68 characters per line, which is the range the legibility
+   research keeps landing on; wider and the eye loses its place on the return
+   sweep, which is felt as "this article is hard work" rather than as a line
+   length problem.
+   ========================================================================== */
+
+@layer components {
+  .prose-post {
+    color: var(--color-body);
+    font-size: 17px;
+    line-height: 1.75;
+  }
+
+  .prose-post > div > * + * {
+    margin-top: 1.4em;
+  }
+
+  .prose-post p {
+    max-width: 68ch;
+  }
+
+  /* Headings step down from the page h1. Tighter leading and a little letter
+     spacing pulled in, so a two-line heading reads as one object. */
+  .prose-post h2,
+  .prose-post h3,
+  .prose-post h4 {
+    color: var(--color-paper);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    position: relative;
+  }
+
+  /* Generous space above, tight below: a heading belongs to the text that
+     follows it, and equal margins on both sides make it float between two
+     sections belonging to neither. */
+  .prose-post h2 {
+    font-size: 1.6em;
+    margin-top: 2.2em;
+    margin-bottom: 0.6em;
+  }
+
+  .prose-post h3 {
+    font-size: 1.25em;
+    margin-top: 1.9em;
+    margin-bottom: 0.5em;
+  }
+
+  .prose-post h4 {
+    font-size: 1.05em;
+    margin-top: 1.6em;
+    margin-bottom: 0.4em;
+  }
+
+  /* The heading anchor. Hidden until the heading is hovered or something
+     inside it is focused, so it is available without being permanent
+     furniture next to every section title. */
+  .prose-post .anchor-link {
+    position: absolute;
+    left: -0.85em;
+    color: var(--color-muted);
+    opacity: 0;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .prose-post h2:hover .anchor-link,
+  .prose-post h3:hover .anchor-link,
+  .prose-post h4:hover .anchor-link,
+  .prose-post .anchor-link:focus-visible {
+    opacity: 1;
+  }
+
+  /* Anchors are outside the text column on wide screens and would sit off the
+     edge of a phone, so below the breakpoint they are simply gone. */
+  @media (max-width: 640px) {
+    .prose-post .anchor-link {
+      display: none;
+    }
+  }
+
+  .prose-post strong {
+    color: var(--color-paper);
+    font-weight: 600;
+  }
+
+  .prose-post a {
+    color: var(--color-paper);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--color-paper) 45%, transparent);
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.2s ease;
+  }
+
+  .prose-post a:hover {
+    text-decoration-color: var(--color-paper);
+  }
+
+  .prose-post ul,
+  .prose-post ol {
+    max-width: 68ch;
+    padding-left: 1.3em;
+  }
+
+  .prose-post ul {
+    list-style: disc;
+  }
+
+  .prose-post ol {
+    list-style: decimal;
+  }
+
+  .prose-post li::marker {
+    color: var(--color-muted);
+  }
+
+  .prose-post li + li {
+    margin-top: 0.5em;
+  }
+
+  /* Nested lists tighten up - the outer spacing already separated the parent
+     item, and repeating it makes a sub-list look like a new section. */
+  .prose-post li > ul,
+  .prose-post li > ol {
+    margin-top: 0.5em;
+  }
+
+  .prose-post blockquote {
+    border-left: 2px solid color-mix(in srgb, var(--color-paper) 30%, transparent);
+    padding-left: 1.2em;
+    color: var(--color-paper);
+    font-style: italic;
+    max-width: 62ch;
+  }
+
+  .prose-post code {
+    background: var(--color-ink-800);
+    border-radius: 4px;
+    padding: 0.15em 0.4em;
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    color: var(--color-paper);
+  }
+
+  /* Code blocks scroll sideways on their own rather than widening the page.
+     The rest of the site guarantees no horizontal scroll; a long line of code
+     is the one thing that legitimately cannot wrap. */
+  .prose-post pre {
+    background: var(--color-ink-900);
+    border: 1px solid rgb(255 255 255 / 0.08);
+    border-radius: var(--radius-surface);
+    padding: 1.1em 1.3em;
+    overflow-x: auto;
+    font-size: 0.9em;
+    line-height: 1.6;
+  }
+
+  .prose-post pre code {
+    background: none;
+    padding: 0;
+    color: var(--color-paper);
+    font-size: inherit;
+  }
+
+  /* aspect-ratio reserves the space before the image arrives. Without it the
+     text below jumps down as each one loads, and that layout shift is a
+     measured ranking signal (CLS) as well as an irritation. */
+  .prose-post img {
+    border-radius: var(--radius-surface);
+    border: 1px solid rgb(255 255 255 / 0.08);
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    display: block;
+  }
+
+  .prose-post hr {
+    border: 0;
+    border-top: 1px solid rgb(255 255 255 / 0.08);
+    margin-top: 2.6em;
+    margin-bottom: 2.6em;
+  }
+
+  /* Tables get their own scroll container for the same reason as code. */
+  .prose-post table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.94em;
+    display: block;
+    overflow-x: auto;
+  }
+
+  .prose-post th,
+  .prose-post td {
+    border-bottom: 1px solid rgb(255 255 255 / 0.08);
+    padding: 0.7em 0.9em;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .prose-post th {
+    color: var(--color-paper);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+}
+
+/* ==========================================================================
+   CARD ENTRANCE
+
+   Used by the blog index. A plain CSS animation rather than a scroll-triggered
+   reveal, on purpose: this runs on load and cannot fail closed. An earlier
+   version of that grid used an IntersectionObserver reveal, and when it did
+   not fire - a client-side navigation that restored scroll position was
+   enough - cards stayed at opacity 0 and posts that existed looked deleted.
+
+   The end state is the element's normal state, so if the animation is blocked,
+   dropped or unsupported the card is simply visible. The reduced-motion rule
+   at the top of this file already collapses the duration to nothing, so no
+   separate media query is needed here.
+   ========================================================================== */
+
+@layer components {
+  @keyframes card-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .card-in {
+    animation: card-in 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) both;
   }
 }

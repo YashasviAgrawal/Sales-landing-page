@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import {
   AnimatePresence,
   motion,
@@ -31,14 +32,17 @@ export function Header() {
           : "border-b border-transparent"
       }`}
     >
-      <div className="mx-auto flex h-[68px] w-full max-w-[1240px] items-center justify-between px-5 md:px-8">
+      <div className="mx-auto flex h-[68px] w-full max-w-[1240px] items-center justify-between gutter-x">
+        {/* The negative margin cancels the padding, so the lockup sits exactly
+            where it did while the tap area covers the full 44px a thumb needs
+            rather than the 28px the mark and its label happen to occupy. */}
         <motion.a
           href="/#top"
-          className="group flex items-center gap-2.5"
+          className="group -my-2 flex items-center gap-2.5 py-2"
           whileHover={reduce ? undefined : { x: 2 }}
           transition={{ type: "spring", stiffness: 320, damping: 22 }}
         >
-          <Wordmark />
+          <BrandMark />
           <span className="text-[15px] font-medium tracking-tight">
             {brand.name}
           </span>
@@ -63,14 +67,18 @@ export function Header() {
             transition={{ type: "spring", stiffness: 320, damping: 22 }}
             className="hidden rounded-full bg-signal px-5 py-2.5 text-[14px] font-medium text-ink-950 transition-colors duration-300 hover:bg-signal-lift sm:inline-flex"
           >
-            {hero.primaryCta}
+            {hero.navCta}
           </motion.a>
+          {/* 44px square. This is the only control on a phone that opens the
+              nav, and at p-2 it was a 36px circle - under every platform's
+              minimum and noticeably fiddly next to the screen edge. The icon
+              is unchanged; the button grew around it. */}
           <button
             type="button"
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
-            className="rounded-full border hairline p-2 text-paper lg:hidden"
+            className="grid h-11 w-11 place-items-center rounded-full border hairline text-paper transition-colors duration-200 active:bg-white/10 lg:hidden"
           >
             {open ? <X size={18} weight="bold" /> : <List size={18} weight="bold" />}
           </button>
@@ -96,7 +104,7 @@ export function Header() {
                   transition: { staggerChildren: reduce ? 0 : 0.05 },
                 },
               }}
-              className="mx-auto flex max-w-[1240px] flex-col px-5 py-3"
+              className="mx-auto flex max-w-[1240px] flex-col gutter-x py-3"
             >
               {nav.map((item) => (
                 <motion.a
@@ -117,6 +125,9 @@ export function Header() {
                 onClick={() => setOpen(false)}
                 className="mt-4 mb-2 inline-flex justify-center rounded-full bg-signal px-5 py-3 text-[15px] font-medium text-ink-950 sm:hidden"
               >
+                {/* The open mobile panel has room, so this one carries the
+                    full page-wide label rather than the shortened header
+                    version. */}
                 {hero.primaryCta}
               </a>
             </motion.div>
@@ -127,22 +138,41 @@ export function Header() {
   );
 }
 
-/* Simple geometric monogram: a funnel narrowing to a point. */
-function Wordmark() {
+/*
+  The brand mark, replacing the geometric funnel monogram that stood in for
+  it. The supplied artwork is the designer's dark-ground lockup - white brain
+  body, black gyri, white keyline, transparent exterior - so it needs no
+  treatment to sit on this page's black, and the keyline gives it a defined
+  edge instead of letting it bleed into the ground.
+
+  Left deliberately uncoloured. The monogram it replaces was mint, which put
+  the accent in two places in one bar; mint now marks only the CTA on the
+  right, which is the one thing in the header worth pointing at.
+
+  The funnel drew itself in on load via pathLength. A raster cannot do that,
+  so the entrance is a fade and a short rise in scale - same timing curve, so
+  it still arrives with the rest of the bar rather than popping in.
+*/
+function BrandMark() {
   const reduce = useReducedMotion();
 
   return (
-    <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
-      <motion.path
-        d="M2 3h18l-6.4 8v7.3L8.4 21v-10L2 3Z"
-        fill="none"
-        stroke="var(--color-signal)"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-        initial={reduce ? { pathLength: 1 } : { pathLength: 0 }}
-        animate={{ pathLength: 1 }}
-        transition={{ duration: 1.2, ease: [0.22, 0.61, 0.36, 1] }}
+    <motion.span
+      className="inline-flex"
+      initial={reduce ? { opacity: 1 } : { opacity: 0, scale: 0.86 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.7, ease: [0.22, 0.61, 0.36, 1], delay: 0.08 }}
+    >
+      {/* Decorative: the brand name is spelled out in the text beside it, so
+          announcing the mark too would just read the name twice. */}
+      <Image
+        src="/brand/mark.png"
+        alt=""
+        width={256}
+        height={219}
+        priority
+        className="h-7 w-auto"
       />
-    </svg>
+    </motion.span>
   );
 }

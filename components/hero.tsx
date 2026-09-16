@@ -8,92 +8,180 @@ import {
   useTransform,
 } from "motion/react";
 import { ArrowDown } from "@phosphor-icons/react";
-import { brand, hero, stages } from "@/lib/content";
+import { brand, hero, links } from "@/lib/content";
 import { MagneticCta } from "@/components/ui/magnetic-cta";
 import { WordReveal } from "@/components/ui/word-reveal";
-import { CountUp } from "@/components/ui/count-up";
 import { AnimatedTooltip } from "@/components/ui/animated-tooltip";
+import { Particles } from "@/components/ui/particles";
 
 const EASE = [0.22, 0.61, 0.36, 1] as const;
 
+/*
+  THE FIRST SCREEN. One centred column, nothing beside it.
+
+  The hero used to run copy against a diagram of the seven links. That
+  diagram is now shown twice further down - as the selector rail in the
+  mechanism section, and as a live chart the reader drives themselves in the
+  symptom check - and showing it a third time in the first viewport bought
+  nothing except a second place for the eye to start.
+
+  So the first screen holds one thing: the claim, said once, in the middle of
+  a black room. Everything here is either the sentence or the room; there is
+  no third element to look at.
+
+  The ground is jet black and stays jet black. It used to carry three green
+  washes - a pool behind the headline and two flanks drifting in from the
+  corners - and they are gone. On a page whose only accent is mint, a hero
+  filled with green light leaves the mint CTA sitting on a field of its own
+  colour with nothing to push against; on true black it is the brightest
+  thing on the screen, which is where the argument wants the eye. The drifting
+  particle field replaces them as the thing that keeps the screen alive, and
+  because it parallaxes against the pointer it also replaces the cursor light
+  that used to do that job. Two cursor effects was one too many.
+
+  The premium reads out of restraint plus timing, not out of ornament:
+
+    - one entrance, choreographed in a single cascade rather than six
+      components each animating on their own schedule
+    - the accent phrase carries the turn and draws its own rule once the
+      last word has landed
+    - the field drifts and leans toward the pointer, so the screen is never
+      quite static and never moving enough to compete with the type
+    - the copy leaves on scroll, slightly faster than the page, while the
+      field stays put - which is the only depth cue a flat black screen has
+
+  Every motion below is off under prefers-reduced-motion. The layout is not.
+*/
 export function Hero() {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
 
-  /* Parallax: the copy and the diagram leave the viewport at different rates,
-     which gives the first screen depth without a background image. */
+  /* The column lifts and dissolves as the page moves under it. */
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
   });
-  const copyY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -70]);
-  const panelY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -150]);
-  const fade = useTransform(scrollYProgress, [0, 0.85], [1, reduce ? 1 : 0.15]);
+  const copyY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : -96]);
+  const fade = useTransform(scrollYProgress, [0, 0.72], [1, reduce ? 1 : 0]);
 
   return (
     <section
       ref={ref}
       id="top"
-      className="relative min-h-[100dvh] overflow-hidden pt-24 pb-16 md:pt-24"
+      /* pt clears the 68px header; pb clears the scroll cue. The 8px the
+         bottom carries over the top is deliberate - optical centre sits a
+         little above true centre. */
+      className="relative flex min-h-[100dvh] items-center overflow-hidden bg-ink-950 pt-24 pb-28"
     >
+      {/*
+        Dust, not stars. Paper white rather than mint: at 140 dots a mint
+        field would be the largest area of accent on the page and the one
+        button that matters would stop being the only green thing on it.
+        `size` and the alpha ceiling inside the component keep the largest
+        dot under 1.5px, so it reads as grain in the air.
+      */}
+      <Particles
+        className="absolute inset-0"
+        quantity={140}
+        staticity={40}
+        ease={60}
+        size={0.4}
+        color="#eaf2ed"
+      />
+
       <AmbientLight />
 
       <motion.div
-        style={{ opacity: fade }}
-        className="relative mx-auto grid min-h-[calc(100dvh-10rem)] w-full max-w-[1240px] grid-cols-1 items-center gap-14 px-5 md:px-8 lg:grid-cols-12 lg:gap-10"
+        style={{ y: copyY, opacity: fade }}
+        className="relative mx-auto w-full max-w-[920px] gutter-x text-center"
       >
-        <motion.div style={{ y: copyY }} className="lg:col-span-6">
-          <motion.p
-            initial={reduce ? { opacity: 1 } : { opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mb-6 flex items-center gap-3 text-[11px] uppercase tracking-[0.18em] text-signal"
-          >
-            <motion.span
-              aria-hidden="true"
-              animate={reduce ? undefined : { opacity: [1, 0.25, 1] }}
-              transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-              className="h-1.5 w-1.5 rounded-full bg-signal"
-            />
-            {hero.eyebrow}
-          </motion.p>
-
-          <WordReveal
-            as="h1"
-            trigger="mount"
-            delay={0.1}
-            stagger={0.07}
-            text={hero.headline}
-            highlight="location."
-            highlightClassName="italic leading-[1.1] text-signal"
-            className="display-tight max-w-[13ch] text-[2.6rem] font-medium sm:text-6xl lg:text-[4.2rem]"
+        {/* A pill rather than a bare line: centred, a bare eyebrow has no
+            left edge to sit against and reads as a stray line of type. */}
+        <motion.p
+          initial={reduce ? { opacity: 1 } : { opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: EASE }}
+          className="inline-flex items-center gap-2.5 rounded-full border hairline bg-white/[0.035] px-4 py-2 text-[11px] uppercase tracking-[0.2em] text-signal backdrop-blur-sm"
+        >
+          <motion.span
+            aria-hidden="true"
+            animate={reduce ? undefined : { opacity: [1, 0.2, 1] }}
+            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+            className="h-1.5 w-1.5 rounded-full bg-signal"
           />
+          {hero.eyebrow}
+        </motion.p>
 
-          <motion.p
-            initial={reduce ? { opacity: 1 } : { opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.75, delay: 0.55, ease: EASE }}
-            className="mt-7 max-w-[46ch] text-[17px] leading-relaxed text-body"
-          >
-            <SubWithTooltip />
-          </motion.p>
+        {/*
+          Two sentences, and the second one is the argument. The measure is
+          set in characters rather than pixels so the break holds at every
+          size: the negation lands, then the correction.
+        */}
+        <WordReveal
+          as="h1"
+          trigger="mount"
+          delay={0.18}
+          stagger={0.055}
+          text={hero.headline}
+          highlight="process problem."
+          highlightClassName="hl-accent"
+          className="display-tight mx-auto mt-7 max-w-[21ch] text-[clamp(2.2rem,5.9vw,3.9rem)] font-medium"
+        />
 
-          <motion.div
-            initial={reduce ? { opacity: 1 } : { opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.75, delay: 0.68, ease: EASE }}
-            className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center"
-          >
-            <MagneticCta href={brand.bookingUrl}>{hero.primaryCta}</MagneticCta>
-            <MagneticCta href={brand.quizUrl} variant="ghost">
-              {hero.secondaryCta}
-            </MagneticCta>
-          </motion.div>
+        <motion.p
+          initial={reduce ? { opacity: 1 } : { opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.62, ease: EASE }}
+          className="mx-auto mt-7 max-w-[54ch] text-[17px] leading-relaxed text-body sm:text-[18px]"
+        >
+          <SubWithTooltip />
+        </motion.p>
+
+        <motion.div
+          initial={reduce ? { opacity: 1 } : { opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.76, ease: EASE }}
+          className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row"
+        >
+          <MagneticCta href={brand.bookingUrl}>{hero.primaryCta}</MagneticCta>
+          <MagneticCta href={brand.quizUrl} variant="ghost">
+            {hero.secondaryCta}
+          </MagneticCta>
         </motion.div>
 
-        <motion.div style={{ y: panelY }} className="lg:col-span-6 lg:pl-6">
-          <LeakPipeline />
-        </motion.div>
+        {/* The risk reversal sits directly under the button, where the
+            hesitation actually happens. Small, quiet, and the last thing
+            read before the click. */}
+        <motion.p
+          initial={reduce ? { opacity: 1 } : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.7, delay: 0.92 }}
+          className="mx-auto mt-6 max-w-[46ch] text-[13px] leading-relaxed text-muted"
+        >
+          {hero.risk}
+        </motion.p>
+
+        {/* Three claims, no invented figures. A trust strip of numbers that
+            are not yet true would be the first thing a founder tests. */}
+        <motion.ul
+          initial={reduce ? { opacity: 1 } : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.7, delay: 1.02 }}
+          className="mx-auto mt-10 flex max-w-[40rem] flex-wrap items-center justify-center gap-x-6 gap-y-2.5 border-t hairline pt-6"
+        >
+          {hero.trust.map((t) => (
+            <li
+              key={t}
+              className="flex items-center gap-2 text-[12px] text-muted"
+            >
+              <span
+                aria-hidden="true"
+                className="h-1 w-1 rounded-full bg-signal/70"
+              />
+              {t}
+            </li>
+          ))}
+        </motion.ul>
       </motion.div>
 
       <ScrollCue />
@@ -103,23 +191,26 @@ export function Hero() {
 
 /*
   The hero subhead, with the phrase that carries the whole argument made
-  hoverable. "One stage" is the claim the rest of the page spends itself
-  proving, and a reader meeting it in the first viewport has no idea yet
-  which five stages are meant - so the answer sits on the phrase rather than
-  forcing a scroll.
+  hoverable. "Seven stages" is a number the reader has no reason to trust in
+  the first viewport, so the names sit on the phrase itself rather than
+  behind a scroll.
 
-  One tooltip, not five. The stage names in the section below live inside
+  The list is derived from `links`, not typed out again, so renaming a link
+  cannot leave a stale enumeration here. The split is derived from the copy
+  for the same reason: if the phrase is ever edited out of hero.sub, this
+  renders the sentence plainly instead of dropping a fragment.
+
+  One tooltip, not seven. The link names in the section below live inside
   buttons, and a tooltip trigger there would nest a control inside a control.
-
-  The split is derived from the copy rather than hardcoded, so editing
-  hero.sub in lib/content.ts cannot leave a stale fragment behind: if the
-  phrase is ever removed, this renders the sentence plainly.
 */
-const TOOLTIP_PHRASE = "one stage";
+const TOOLTIP_PHRASE = "seven stages";
 
 function SubWithTooltip() {
   const at = hero.sub.indexOf(TOOLTIP_PHRASE);
   if (at === -1) return <>{hero.sub}</>;
+
+  const names = links.map((l) => l.name);
+  const list = `${names.slice(0, -1).join(", ")} or ${names[names.length - 1]}.`;
 
   return (
     <>
@@ -127,7 +218,7 @@ function SubWithTooltip() {
       <AnimatedTooltip
         variant="indis"
         restColor="var(--color-paper)"
-        content="Offer, Message, Demand, Conversion or Retention. Almost never all five at once."
+        content={`${list} Deals almost never die in more than one.`}
       >
         {TOOLTIP_PHRASE}
       </AnimatedTooltip>
@@ -137,34 +228,24 @@ function SubWithTooltip() {
 }
 
 /*
-  Ambient light. Two large green washes drifting at different speeds, plus a
-  fine grain layer. Motivated: the reference's surfaces sit on a lit forest
-  ground that falls off to near-black at the edges, and the grain is visible
-  in it. This is that, in CSS, with no image to download and nothing that
-  competes with the type.
+  What is left of the ambient layer once the green went.
+
+  Three things, in the order light actually stacks: the pale sweep that
+  crosses every few seconds, the fall-off that pulls the corners down so the
+  eye starts on the type, then grain over all of it.
+
+  It sits above the particle canvas deliberately. The vignette dims the dots
+  at the edges of the screen and leaves the field densest behind the
+  headline, which is the difference between a background and a backdrop.
+
+  No image to download, and nothing here that moves fast enough to compete
+  with a sentence.
 */
 function AmbientLight() {
   const reduce = useReducedMotion();
 
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-      {/* The lit corner, falling off across the screen as in the reference. */}
-      <motion.div
-        className="wash-hero-near absolute inset-0"
-        animate={
-          reduce ? undefined : { x: [0, 60, -30, 0], y: [0, 40, 10, 0] }
-        }
-        transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
-      />
-
-      <motion.div
-        className="wash-hero-far absolute inset-0"
-        animate={
-          reduce ? undefined : { x: [0, -70, 20, 0], y: [0, 50, -20, 0] }
-        }
-        transition={{ duration: 34, repeat: Infinity, ease: "easeInOut" }}
-      />
-
       {/* A slow sweep of light across the whole first screen. */}
       <motion.div
         className="wash-sweep absolute inset-y-0 -left-1/3 w-1/3 skew-x-[-14deg]"
@@ -177,105 +258,9 @@ function AmbientLight() {
         }}
       />
 
+      <div className="hero-vignette absolute inset-0" />
       <div className="grain absolute inset-0" />
     </div>
-  );
-}
-
-/*
-  The mechanism, drawn. Each bar is one sales stage and its width is how much
-  volume survives that stage. The narrowing is the argument the whole page
-  makes, so it belongs in the first viewport rather than in a body paragraph.
-*/
-function LeakPipeline() {
-  const reduce = useReducedMotion();
-
-  return (
-    <motion.div
-      initial={reduce ? { opacity: 1 } : { opacity: 0, y: 28 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.9, delay: 0.25, ease: EASE }}
-      className="glow-panel relative rounded-[12px] border hairline bg-ink-900/60 p-6 backdrop-blur-sm sm:p-8"
-    >
-      {/* A hairline that traces the panel edge once on arrival. */}
-      <motion.span
-        aria-hidden="true"
-        initial={reduce ? { scaleX: 1 } : { scaleX: 0 }}
-        animate={{ scaleX: 1 }}
-        transition={{ duration: 1.1, delay: 0.5, ease: EASE }}
-        className="absolute inset-x-0 top-0 h-px origin-left bg-signal/60"
-      />
-
-      <p className="mb-7 text-[13px] text-muted">
-        A hundred conversations, five stages, one constriction.
-      </p>
-
-      <div className="flex flex-col gap-5">
-        {stages.map((s, i) => {
-          const isLeak = s.id === "conversion";
-          return (
-            <div key={s.id}>
-              <div className="mb-2 flex items-baseline justify-between gap-4">
-                <span
-                  className={`text-[13px] font-medium tracking-tight ${
-                    isLeak ? "text-signal" : "text-paper"
-                  }`}
-                >
-                  {s.name}
-                </span>
-                <CountUp
-                  to={s.flow}
-                  delay={0.35 + i * 0.11}
-                  duration={0.9}
-                  className="font-mono text-[11px] text-muted"
-                />
-              </div>
-
-              <div className="h-2.5 w-full overflow-hidden rounded-full bg-white/[0.055]">
-                <motion.div
-                  initial={reduce ? false : { width: 0 }}
-                  animate={{ width: `${s.flow}%` }}
-                  transition={{
-                    duration: 0.9,
-                    delay: 0.35 + i * 0.11,
-                    ease: EASE,
-                  }}
-                  className={`relative h-full rounded-full ${
-                    isLeak ? "hatch" : "bg-white/25"
-                  }`}
-                >
-                  {/* The leaking stage keeps pulsing. Nothing else moves. */}
-                  {isLeak && !reduce && (
-                    <motion.span
-                      aria-hidden="true"
-                      animate={{ opacity: [0, 0.55, 0] }}
-                      transition={{
-                        duration: 2.6,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                        delay: 1.4,
-                      }}
-                      className="absolute inset-0 rounded-full bg-paper"
-                    />
-                  )}
-                </motion.div>
-              </div>
-
-              {isLeak && (
-                <motion.p
-                  initial={reduce ? { opacity: 1 } : { opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.6, delay: 1.1 }}
-                  className="mt-2 text-[12px] text-signal/80"
-                >
-                  The most common leak, and the least served by software
-                </motion.p>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </motion.div>
   );
 }
 
@@ -284,11 +269,11 @@ function ScrollCue() {
 
   return (
     <motion.a
-      href="/#stages"
+      href="/#mechanism"
       initial={reduce ? { opacity: 1 } : { opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.8, delay: 1.3 }}
-      aria-label="Scroll to the five stages"
+      transition={{ duration: 0.8, delay: 1.35 }}
+      aria-label="Scroll to the seven links"
       className="absolute bottom-7 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 text-muted transition-colors hover:text-signal md:flex"
     >
       <span className="text-[10px] uppercase tracking-[0.22em]">Scroll</span>

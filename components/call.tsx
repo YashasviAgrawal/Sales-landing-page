@@ -11,9 +11,23 @@ import {
 } from "motion/react";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
 import { WordReveal } from "@/components/ui/word-reveal";
-import { audit } from "@/lib/content";
+import { MagneticCta } from "@/components/ui/magnetic-cta";
+import { brand, call, hero } from "@/lib/content";
 
-export function Audit() {
+/*
+  WHAT HAPPENS ON THE CALL.
+
+  The objection this section answers is never stated out loud: "free" means
+  "sales call". So it does not argue - it just publishes the agenda, minute
+  by minute, and lets the specificity do the work. Four numbered lines a
+  reader can hold someone to.
+
+  The closing paragraph is the most load-bearing copy on the page and is set
+  larger than the steps above it for that reason. It concedes the commercial
+  motive rather than hiding it, which is the only move that makes a free
+  diagnostic believable to someone who has been pitched before.
+*/
+export function Call() {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
 
@@ -36,10 +50,10 @@ export function Audit() {
 
   return (
     /* No border-t: the section above is tinted, so its edge is the divider. */
-    <section id="audit" className="section-y scroll-mt-24">
+    <section id="call" className="section-y scroll-mt-24">
       <div
         ref={ref}
-        className="mx-auto grid w-full max-w-[1240px] grid-cols-1 gap-10 px-5 md:px-8 lg:grid-cols-12 lg:gap-14"
+        className="mx-auto grid w-full max-w-[1240px] grid-cols-1 gap-10 gutter-x lg:grid-cols-12 lg:gap-14"
       >
         <div className="lg:col-span-5">
           <div className="lg:sticky lg:top-28">
@@ -51,31 +65,25 @@ export function Audit() {
 
         <div className="lg:col-span-7">
           <WordReveal
-            text={audit.heading}
-            highlight="before we sell you a fix"
-            className="display-tight max-w-[18ch] text-3xl font-medium sm:text-5xl lg:text-[3.4rem]"
+            text={call.heading}
+            highlight="exactly what happens."
+            className="display-tight max-w-[16ch] text-3xl font-medium sm:text-5xl lg:text-[3.4rem]"
           />
 
           <Reveal delay={0.1}>
             <p className="mt-6 max-w-[54ch] text-[17px] leading-relaxed text-body">
-              {audit.lead}
+              {call.lead}
             </p>
           </Reveal>
 
-          {/*
-            Two columns of one-line deliverables. Stacked full-width with a
-            paragraph each, these six ran most of a screen on their own; what
-            the reader needs here is the shape of what arrives, and the detail
-            belongs on the call.
-          */}
           <RevealGroup
             as="ol"
-            stagger={0.06}
-            className="mt-10 grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2"
+            stagger={0.08}
+            className="mt-10 flex flex-col gap-6"
           >
-            {audit.deliverables.map((d, i) => (
+            {call.steps.map((s, i) => (
               <RevealItem
-                key={d.title}
+                key={s.title}
                 as="li"
                 direction="left"
                 distance={22}
@@ -84,17 +92,28 @@ export function Audit() {
                 <span className="mt-[3px] font-mono text-[11px] text-signal">
                   0{i + 1}
                 </span>
-                <div>
-                  <p className="text-[16px] tracking-tight text-paper">
-                    {d.title}
-                  </p>
-                  <p className="mt-1 text-[14px] leading-relaxed text-body">
-                    {d.body}
-                  </p>
-                </div>
+                <p className="max-w-[50ch] text-[16px] leading-relaxed text-body">
+                  <span className="tracking-tight text-paper">{s.title} </span>
+                  {s.body}
+                </p>
               </RevealItem>
             ))}
           </RevealGroup>
+
+          <Reveal delay={0.12} blur>
+            <p className="mt-10 max-w-[54ch] border-l-2 border-signal/50 pl-5 text-[17px] leading-relaxed text-paper">
+              {call.closer}
+            </p>
+          </Reveal>
+
+          {/* CTA three of four. */}
+          <Reveal delay={0.16}>
+            <div className="mt-10">
+              <MagneticCta href={brand.bookingUrl}>
+                {hero.primaryCta}
+              </MagneticCta>
+            </div>
+          </Reveal>
         </div>
       </div>
     </section>
@@ -122,11 +141,11 @@ export function Audit() {
      there is no CSS filter running on every frame and no brown left to argue
      with the mint.
 
-  3. No frame. The vignette takes the photograph's own edges down into the
+  3. No frame. The vignette takes the photograph’s own edges down into the
      page ground, so there is no rectangle and no border - the image emerges
      from the section instead of being pasted onto it. The one warm-free
      accent is a mint glow sitting exactly on the lens: the only place the
-     picture is sharp is the only place the site's colour appears.
+     picture is sharp is the only place the site’s colour appears.
 */
 function ThroughTheGlasses({
   y,

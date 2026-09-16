@@ -7,7 +7,7 @@ import { WordReveal } from "@/components/ui/word-reveal";
 import { Reveal } from "@/components/ui/reveal";
 import { CreepyButton } from "@/components/ui/creepy-button";
 
-type Status = "idle" | "invalid" | "sent";
+type Status = "idle" | "invalid" | "sending" | "sent" | "failed";
 
 /*
   The closing section, and the destination for every CTA on the page.
@@ -23,8 +23,12 @@ type Status = "idle" | "invalid" | "sent";
   itself - the page argues that finding a leak takes paying attention, and
   the thing you actually press to book watches you back.
 
-  The form hands the enquiry to an ordinary email rather than pretending to
-  have a backend, so nothing here can break.
+  The form used to hand the enquiry to a mailto rather than pretend to have a
+  backend. It has one now: POST /api/leads writes the row to Supabase and the
+  admin panel at /admin reads it. The mailto did not go away, though - it is
+  the fallback for when the API cannot take the write, because the worst
+  outcome for a form at the bottom of a page someone just read is that their
+  answers evaporate. See the `failed` branch below.
 */
 export function Book() {
   const reduce = useReducedMotion();
@@ -32,40 +36,81 @@ export function Book() {
   const [form, setForm] = useState({
     name: "",
     email: "",
-    company: "",
+    website: "",
     context: "",
+    /*
+      The honeypot. Hidden from people and from screen readers, so only a bot
+      filling in every field it finds will put anything here. The server sees
+      a non-empty value, answers 200, and writes nothing.
+    */
+    company: "",
   });
 
   function set(key: keyof typeof form, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
-    if (status !== "idle") setStatus("idle");
+    /* Clear a validation or failure message as soon as they start fixing it,
+       but never interrupt a send in flight. */
+    if (status === "invalid" || status === "failed") setStatus("idle");
   }
 
-  function submit() {
+  /* The enquiry as an email, used only when the write fails. */
+  function mailtoHref() {
+    const body = [
+      `Name: ${form.name}`,
+      `Email: ${form.email}`,
+      form.website ? `Website: ${form.website}` : null,
+      "",
+      "Biggest thing holding revenue back right now:",
+      form.context || "(not said yet)",
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    return (
+      `mailto:${brand.email}` +
+      `?subject=${encodeURIComponent(`Sales audit request - ${form.name}`)}` +
+      `&body=${encodeURIComponent(body)}`
+    );
+  }
+
+  async function submit() {
+    if (status === "sending") return;
+
+    /*
+      The same expression the server validates with, deliberately. Two
+      validators that disagree produce the worst possible bug: a form that
+      accepts a value and an API that rejects it, with the reader in the
+      middle being told to fix something that looks fine.
+    */
     const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email);
     if (!form.name.trim() || !validEmail) {
       setStatus("invalid");
       return;
     }
 
-    const body = [
-      `Name: ${form.name}`,
-      `Email: ${form.email}`,
-      form.company ? `Company: ${form.company}` : null,
-      "",
-      "Where sales feels like it is leaking:",
-      form.context || "(not said yet)",
-    ]
-      .filter(Boolean)
-      .join("\n");
+    setStatus("sending");
 
-    const href =
-      `mailto:${brand.email}` +
-      `?subject=${encodeURIComponent(`Leak audit request - ${form.name}`)}` +
-      `&body=${encodeURIComponent(body)}`;
+    try {
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
-    window.location.href = href;
-    setStatus("sent");
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      setStatus("sent");
+      setForm({ name: "", email: "", website: "", context: "", company: "" });
+    } catch {
+      /*
+        The write failed - the keys are missing, the database is down, or
+        they are offline. Rather than lose four fields of considered writing,
+        open their email client with the same answers filled in. They still
+        reach us; we just find out by inbox instead of by panel.
+      */
+      setStatus("failed");
+      window.location.href = mailtoHref();
+    }
   }
 
   const field =
@@ -97,27 +142,38 @@ export function Book() {
         transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      <div className="relative mx-auto grid w-full max-w-[1240px] grid-cols-1 gap-10 px-5 md:px-8 lg:grid-cols-12 lg:gap-14">
+      <div className="relative mx-auto grid w-full max-w-[1240px] grid-cols-1 gap-10 gutter-x lg:grid-cols-12 lg:gap-14">
         <div className="lg:col-span-5">
           <WordReveal
             text={book.heading}
-            highlight="is leaving"
+            highlight="Then decide."
             stagger={0.07}
-            className="display-tight max-w-[13ch] text-4xl font-medium sm:text-5xl lg:text-[3.6rem]"
+            className="display-tight max-w-[12ch] text-4xl font-medium sm:text-5xl lg:text-[3.6rem]"
           />
           <Reveal delay={0.12} blur>
-            <p className="mt-6 max-w-[42ch] text-[16px] leading-relaxed text-body">
+            <p className="mt-6 max-w-[40ch] text-[17px] leading-relaxed text-paper">
               {book.lead}
+            </p>
+            <p className="mt-3 max-w-[40ch] text-[17px] leading-relaxed text-body">
+              {book.support}
             </p>
           </Reveal>
           <Reveal delay={0.18}>
-            <p className="mt-6 max-w-[38ch] text-[14px] leading-relaxed text-muted">
-              {book.support}
+            <p className="mt-7 text-[14px] text-muted">{book.scarcity}</p>
+
+            {/*
+              The P.S. The cost of waiting, stated once, at the last possible
+              moment. It is italic and quiet on purpose: an aggressive version
+              of this sentence would undo the whole no-pitch promise above it.
+            */}
+            <p className="mt-7 max-w-[42ch] border-l-2 border-signal/40 pl-4 text-[14px] italic leading-relaxed text-muted">
+              {book.ps}
             </p>
-            <p className="mt-6 text-[14px] text-muted">{brand.city}</p>
+
+            <p className="mt-7 text-[14px] text-muted">{brand.city}</p>
             <a
               href={`mailto:${brand.email}`}
-              className="link-underline mt-1 inline-block text-[14px] text-body transition-colors hover:text-signal"
+              className="link-underline tap-area mt-1 inline-block text-[14px] text-body transition-colors hover:text-signal"
             >
               {brand.email}
             </a>
@@ -156,17 +212,22 @@ export function Book() {
 
               <label className="flex flex-col gap-2 sm:col-span-2">
                 <span className="text-[13px] text-muted">
-                  {book.fields.company}
+                  {book.fields.website}
                 </span>
                 <input
                   className={field}
-                  value={form.company}
-                  onChange={(e) => set("company", e.target.value)}
-                  autoComplete="organization"
-                  placeholder="Company name"
+                  value={form.website}
+                  onChange={(e) => set("website", e.target.value)}
+                  autoComplete="url"
+                  placeholder="yourcompany.com"
                 />
               </label>
 
+              {/*
+                The qualifier. It is the fourth and last field because it is
+                the one that earns its place twice: it filters out tyre-kickers
+                and it gives us the first half of the call before it starts.
+              */}
               <label className="flex flex-col gap-2 sm:col-span-2">
                 <span className="text-[13px] text-muted">
                   {book.fields.context}
@@ -175,22 +236,81 @@ export function Book() {
                   className={`${field} min-h-[96px] resize-y`}
                   value={form.context}
                   onChange={(e) => set("context", e.target.value)}
-                  placeholder="Good calls, then silence. Two of the last six proposals closed and I cannot say why."
+                  placeholder="Good calls, then silence. Two of the last six proposals closed and I can’t say why."
                 />
               </label>
+
+              {/*
+                The honeypot, and the three separate things it takes to hide
+                one properly. `hidden` alone would do it, but a bot that
+                respects `hidden` is not the kind that needs catching:
+
+                  aria-hidden + tabIndex   keeps it off the screen reader and
+                                           out of the tab order, so nobody
+                                           using a keyboard or a screen reader
+                                           ever lands in a field they cannot
+                                           see and fails their own submission
+                  autoComplete="off"       stops the browser helpfully filling
+                                           it with a saved company name, which
+                                           would silently discard a real lead
+                  the wrapper, not input   position/opacity on a container is
+                                           harder to spot than display:none on
+                                           the field itself
+
+                It is named "company" because that is a field name a form
+                filler expects to find and will populate. A field called
+                "leave-this-blank" teaches the bot exactly what to skip.
+              */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute left-[-9999px] h-0 w-0 overflow-hidden opacity-0"
+              >
+                <label>
+                  Company
+                  <input
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={form.company}
+                    onChange={(e) => set("company", e.target.value)}
+                  />
+                </label>
+              </div>
             </div>
 
             <div className="mt-6 flex flex-wrap items-center gap-5">
-              <CreepyButton onClick={submit} className="text-[15px]">
-                {book.submit}
+              <CreepyButton
+                onClick={submit}
+                disabled={status === "sending"}
+                className={`text-[15px] ${status === "sending" ? "pointer-events-none opacity-70" : ""}`}
+              >
+                {status === "sending" ? book.sending : book.submit}
               </CreepyButton>
 
-              <p className="max-w-[32ch] text-[13px] leading-relaxed text-muted">
+              {/*
+                One line, five states, same slot. The message replaces the
+                privacy note rather than appearing beneath it, so the block
+                never changes height and the button never moves under the
+                cursor at the moment it is pressed.
+
+                aria-live="polite" is what makes the result reach a screen
+                reader at all: the text swaps in without any focus change, so
+                without it the only feedback on a successful submission is
+                visual.
+              */}
+              <p
+                aria-live="polite"
+                className="max-w-[32ch] text-[13px] leading-relaxed text-muted"
+              >
                 {status === "invalid" ? (
                   <span className="text-signal">{book.invalid}</span>
+                ) : status === "sending" ? (
+                  <span className="text-body">{book.sending}</span>
                 ) : status === "sent" ? (
+                  <span className="text-signal">{book.sent}</span>
+                ) : status === "failed" ? (
                   <span className="text-body">
-                    {book.sent}{" "}
+                    {book.failed}{" "}
                     <a
                       href={`mailto:${brand.email}`}
                       className="text-signal underline"

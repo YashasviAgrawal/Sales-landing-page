@@ -540,14 +540,31 @@ export function AnimatedFooter({
         </div>
       </div>
 
-      {/* Display headings */}
-      <div className="absolute inset-x-0 bottom-0 flex items-end justify-center gap-4 p-8">
+      {/*
+        Display headings.
+
+        `whitespace-nowrap` and `shrink-0` are load-bearing, not styling. The
+        reveal animates one character at a time, so every letter is its own
+        inline-block - and that gives the line breaker a break opportunity
+        between every pair of letters. The moment the row is wider than the
+        band, the words do not overflow, they shatter: on a 355px phone this
+        rendered as "SALE / S" and "BRAI / N" stacked in two columns.
+        nowrap removes the break opportunities and shrink-0 stops flex from
+        squeezing the boxes that would cause it.
+
+        With breaking off, the type has to actually fit instead. Two 5-letter
+        words come to roughly 6.3em of advance width together, so the
+        coefficient and the padding below are set so that 6.3em still clears
+        the band's inner width at 320px - the narrowest screen in use - and
+        the mobile padding and gap are cut to buy that room back.
+      */}
+      <div className="absolute inset-x-0 bottom-0 flex items-end justify-center gap-3 p-4 sm:gap-4 sm:p-8">
         {headingLines.map((word, wi) => (
           <h2
             key={`${word}-${wi}`}
             aria-label={word}
-            className="overflow-hidden font-medium leading-none tracking-tight pb-[0.15em] -mb-[0.15em]"
-            style={{ fontSize: "clamp(2rem, 13cqw, 11rem)" }}
+            className="shrink-0 overflow-hidden whitespace-nowrap font-medium leading-none tracking-tight pb-[0.15em] -mb-[0.15em]"
+            style={{ fontSize: "clamp(1.75rem, 12cqw, 11rem)" }}
           >
             {Array.from(word).map((ch, ci) => (
               <span

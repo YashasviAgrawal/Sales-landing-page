@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { brand } from "@/lib/content";
 import { WordReveal } from "@/components/ui/word-reveal";
@@ -5,15 +7,60 @@ import { Reveal } from "@/components/ui/reveal";
 import { MagneticCta } from "@/components/ui/magnetic-cta";
 
 /*
+  A 404 must never be indexable.
+
+  Next already answers this route with a real 404 status, which is the part
+  that matters most - but the page inherits the root layout's `index: true`,
+  and a soft-404 that says it may be indexed is how "This one really is
+  broken." ends up in someone's search results under the brand name.
+
+  `follow: true` is deliberate: do not index this page, but do follow the
+  links on it back to the pages that should be indexed.
+*/
+export const metadata: Metadata = {
+  title: "Page not found",
+  robots: { index: false, follow: true },
+  /*
+    No canonical at all, which is why this is explicitly null rather than
+    omitted - without it the page inherits the layout's `canonical: "/"` and
+    every 404 on the site declares itself a duplicate of the home page. That
+    is the textbook soft-404 signal: it invites Google to treat a genuinely
+    missing URL as a real page, and to keep re-crawling addresses that will
+    never exist.
+  */
+  alternates: { canonical: null },
+};
+
+/*
   A real 404, so a mistyped or stale URL lands somewhere branded with a way
-  back, rather than on the framework's bare default.
+  back, rather than on the framework’s bare default.
 */
 export default function NotFound() {
   return (
-    <main className="flex min-h-[100dvh] items-center justify-center px-5 py-24">
+    <main className="flex min-h-[100dvh] items-center justify-center gutter-x py-24">
       <div className="mx-auto w-full max-w-[54ch] text-center">
+        {/* This is the only page that renders without the header, so the mark
+            has to carry the branding on its own - and it doubles as the first
+            way back, above the two CTAs below. */}
         <Reveal>
-          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-signal">
+          <Link
+            href="/"
+            aria-label={`${brand.name} home`}
+            className="inline-flex transition-opacity hover:opacity-80"
+          >
+            <Image
+              src="/brand/mark.png"
+              alt=""
+              width={256}
+              height={219}
+              priority
+              className="h-10 w-auto"
+            />
+          </Link>
+        </Reveal>
+
+        <Reveal delay={0.05}>
+          <p className="mt-8 font-mono text-[11px] uppercase tracking-[0.2em] text-signal">
             404
           </p>
         </Reveal>
@@ -22,8 +69,8 @@ export default function NotFound() {
           as="h1"
           trigger="mount"
           delay={0.1}
-          text="This page has a location problem."
-          highlight="location"
+          text="This one really is broken."
+          highlight="really is broken."
           className="display-tight mx-auto mt-6 max-w-[18ch] text-4xl font-medium sm:text-6xl"
         />
 
@@ -38,7 +85,7 @@ export default function NotFound() {
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <MagneticCta href="/">Back to the start</MagneticCta>
             <MagneticCta href={brand.bookingUrl} variant="ghost">
-              Book the audit
+              Book the free audit
             </MagneticCta>
           </div>
         </Reveal>
