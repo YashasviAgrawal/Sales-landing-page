@@ -350,6 +350,91 @@
       transparent 54%
     );
   }
+
+  /*
+    THE CENTRED HERO.
+
+    The two washes above are flanks - they come in from off-screen at the top
+    corners, which is right for a hero whose copy sits in the left column.
+    With the copy in the middle of the screen the middle of the screen has to
+    be the lit part, or the headline reads as sitting in the one unlit band
+    between two glows.
+
+    `wash-hero-core` is that light: one soft pool behind the headline, sized
+    to the measure of the type rather than to the viewport, so it lifts the
+    display line and falls off before it reaches the trust strip. It breathes
+    in the component; the paint is here.
+  */
+  .wash-hero-core {
+    background: radial-gradient(
+      900px 580px at 50% 34%,
+      color-mix(in srgb, var(--color-aura) 42%, transparent),
+      color-mix(in srgb, var(--color-signal) 8%, transparent) 32%,
+      transparent 64%
+    );
+  }
+
+  /*
+    Edge fall-off. Centred copy needs the corners pulled down, otherwise the
+    two flank washes are the brightest thing on screen and the eye starts at
+    a corner instead of at the headline. Transparent across the middle 46%,
+    so nothing is laid over the type or the button.
+  */
+  .hero-vignette {
+    background: radial-gradient(
+      124% 96% at 50% 46%,
+      transparent 46%,
+      color-mix(in srgb, var(--color-ink-950) 55%, transparent) 80%,
+      var(--color-ink-950) 100%
+    );
+  }
+
+  /*
+    The accent words in the hero headline. Mint, italic, and lit from behind
+    - a text-shadow at this radius is not legible as a shadow, only as the
+    words being the brightest thing in the composition, which is exactly the
+    job of the phrase that carries the turn.
+
+    The rule underneath draws itself once, after the last word has landed
+    (the reveal finishes at ~1.4s). It is applied per word by WordReveal, so
+    the gap between the words stays open and it reads as an underline rather
+    than a bar. Cancelled outright under reduced motion, where an animation
+    delay would otherwise still make it appear late and unexplained.
+  */
+  .hl-accent {
+    position: relative;
+    font-style: italic;
+    color: var(--color-signal);
+    text-shadow: 0 0 48px color-mix(in srgb, var(--color-signal) 38%, transparent);
+  }
+  .hl-accent::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: -0.04em;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-signal) 20%, transparent),
+      var(--color-signal),
+      color-mix(in srgb, var(--color-signal) 20%, transparent)
+    );
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: hl-draw 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) 1.45s forwards;
+  }
+  @keyframes hl-draw {
+    to {
+      transform: scaleX(1);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hl-accent::after {
+      animation: none;
+      transform: scaleX(1);
+    }
+  }
   .wash-book {
     background: radial-gradient(
       600px 380px at 80% 0%,

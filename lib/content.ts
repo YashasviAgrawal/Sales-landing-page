@@ -5,7 +5,8 @@
   placeholders. Replace before launch. Search for "// PLACEHOLDER".
 
   Positioning, which everything below depends on:
-    Big idea       - Your revenue isn’t broken everywhere. It’s broken in one place.
+    Big idea       - It isn’t a sales problem. It’s a process problem, and the
+                     process breaks in exactly one place.
     Mechanism      - The Revenue Leak Audit. A diagnosis before a prescription.
     The enemy      - Guesswork. Buying solutions for an undiagnosed problem.
     One line       - Every agency sells you a cure. We find the disease first.
@@ -69,15 +70,22 @@ export const CTA = "Book My Free Sales Audit";
 
 export const hero = {
   eyebrow: "We diagnose before we prescribe",
-  headline: "Your revenue isn’t broken everywhere. It’s broken in one place.",
   /*
-    The enumeration the brief asks for named five things, two of which are
-    not links in this chain and three of which were missing - so a reader who
-    hovered the tooltip got a different list than the sentence they were
-    reading. Naming the count instead of the members is shorter, survives a
-    rename, and turns the tooltip into the payoff rather than a correction.
+    Set in sentence case with typographic apostrophes, like every other
+    heading on this page. The turn is the second sentence, and the hero
+    renders "process problem." in the accent so the turn is visible before
+    it is read.
   */
-  sub: "We find the exact leak — one of seven places revenue quietly escapes — then fix it. Most founders see the gap inside 45 minutes.",
+  headline: "You don’t have a sales problem. You have a process problem.",
+  /*
+    "Seven stages" is the phrase the tooltip hangs on, and the tooltip names
+    them from `links` rather than from a second copy of the list - so a
+    renamed link cannot leave a stale enumeration in the first viewport.
+
+    The reader's word is "stages"; ours is "links in a chain". The hero uses
+    theirs and the mechanism section earns ours.
+  */
+  sub: "We analyse all seven stages of your pipeline, find the one where deals die, and rebuild it.",
   primaryCta: CTA,
   navCta: "Book My Sales Audit",
   secondaryCta: "Show me what’s broken",
